@@ -175,7 +175,7 @@ body { font-family: 'Manrope', sans-serif; color: #3a3530; background: #fff; -we
 .rsvp-block input[type="text"]:focus, .rsvp-block textarea:focus { border-color:#b8895a; }
 .rsvp-block textarea { resize:vertical; }
 .rsvp-party-header { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:400; margin:28px 0 16px; padding-bottom:8px; border-bottom:1px solid #eee; }
-.rsvp-member-card { margin-bottom:20px; padding:20px 24px; background:#f7f7f7; border:1px solid #eee; }
+.rsvp-member-card { margin-bottom:20px; padding:20px 24px; background:#faf6ef; border:1px solid #ebe4d4; }
 .rsvp-member-card .member-name { font-family:'Manrope',sans-serif; font-size:16px; font-weight:500; margin-bottom:12px; color:#3a3530; }
 .rsvp-event-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px solid #eee; flex-wrap:wrap; }
 .rsvp-event-row:last-child { border-bottom:none; }
@@ -358,8 +358,8 @@ const CONFIG = {
       time: "4:00 PM — 12:30 AM",
       venue: "Lavender Ridge Farm",
       address: "2584 Upper Dwyer Hill Rd, Ottawa, ON K0A 1L0",
-      description: "Ceremony begins at 4:30 PM on the grounds, followed by cocktail hour, a BBQ dinner, and dancing in the barn under string lights.",
-      dresscode: "Smart Casual",
+      description: "",
+      dresscode: "Semi-Formal",
       note: "",
       imageUrl: "",          // Fallback — auto-filled from photoFolder/divider.* if available
       imagePosition: "center",
@@ -381,12 +381,12 @@ const CONFIG = {
   weddingDayDate: "Sunday, August 2, 2026",  // Shown in the timeline header
   timeline: [
     { time: "4:00 PM", label: "Guest Arrival" },
-    { time: "4:30 PM", label: "Ceremony Begins (on the lawn)" },
-    { time: "5:00 PM", label: "Cocktail Hour" },
-    { time: "6:30 PM", label: "BBQ Dinner is Served" },
-    { time: "8:00 PM", label: "Dancing & Celebration" },
-    { time: "10:30 PM", label: "Late Night Snacks" },
-    { time: "12:00 AM", label: "Last Dance & Sparkler Send-Off" },
+    { time: "5:00 PM", label: "Ceremony Begins" },
+    { time: "5:30 PM", label: "Cocktail Hour & Lawn Games" },
+    { time: "6:30 PM", label: "BBQ Dinner Served" },
+    { time: "8:30 PM", label: "Dancing & Celebration" },
+    { time: "10:30 PM", label: "Late Night Snacks & Bonfire" },
+    { time: "12:30 AM", label: "Last Dance & Send-Off" },
   ],
 
   // ─── GUEST LIST ──────────────────────────────────────────────────────────────
@@ -403,89 +403,340 @@ const CONFIG = {
   //   - Single guest: 1 member
   //
   guestParties: [
-    {
-      partyName: "Duguay",    // Guests will type this to find their party
+    { // 1
+      partyName: "Claudia Duguay",
       members: [
         { name: "Claudia Duguay", events: ["wedding"] },
+      ],
+    },
+    { // 2
+      partyName: "Ian Connors",
+      members: [
+        { name: "Ian Connors", events: ["wedding"] },
+      ],
+    },
+    { // 3
+      partyName: "Mikaela Ney",
+      members: [
+        { name: "Mikaela Ney", events: ["wedding"] },
+        { name: "Josh Lehr", events: ["wedding"] },
+      ],
+    },
+    { // 4
+      partyName: "Hillary Lloyd",
+      members: [
+        { name: "Hillary Lloyd", events: ["wedding"] },
+        { name: "Coleman Ney", events: ["wedding"] },
+      ],
+    },
+    { // 5
+      partyName: "Sam Guibord",
+      members: [
+        { name: "Sam Guibord", events: ["wedding"] },
+      ],
+    },
+    { // 6
+      partyName: "Maxine McAuley",
+      members: [
+        { name: "Maxine McAuley", events: ["wedding"] },
+        { name: "Mike McAuley", events: ["wedding"] },
+      ],
+    },
+    { // 7
+      partyName: "Jeff Crosier",
+      members: [
+        { name: "Jeff Crosier", events: ["wedding"] },
+        { name: "Sam Murphy", events: ["wedding"] },
+      ],
+    },
+    { // 8
+      partyName: "Alex Iannantuono",
+      members: [
+        { name: "Alex Iannantuono", events: ["wedding"] },
+        { name: "Alex's man Taylor", events: ["wedding"] },
+        { name: "Penny", events: ["wedding"] },
+      ],
+    },
+    { // 9
+      partyName: "Jill Townsend",
+      members: [
+        { name: "Jill Townsend", events: ["wedding"] },
+      ],
+    },
+    { // 10
+      partyName: "Kaitlin Bourgon",
+      members: [
+        { name: "Kaitlin Bourgon", events: ["wedding"] },
+        { name: "Josh Cohen-Collier", events: ["wedding"] },
+      ],
+    },
+    { // 11
+      partyName: "Jean Duguay",
+      members: [
         { name: "Jane Duguay", events: ["wedding"] },
         { name: "Jean Duguay", events: ["wedding"] },
-
       ],
     },
-    {
-      partyName: "Williams",
+    { // 12
+      partyName: "Jeanne Lamarche",
       members: [
-        { name: "Bob Williams", events: ["wedding"] },
-        { name: "Sarah Williams", events: ["wedding"] },
+        { name: "Jeanne Lamarche", events: ["wedding"] },
       ],
     },
-    {
-      partyName: "Davis",
+    { // 13
+      partyName: "Oszczakiewicz",
       members: [
-        { name: "Carol Davis", events: ["wedding"] },
+        { name: "Gerry Oszczakiewicz", events: ["wedding"] },
+        { name: "Chris Oszczakiewicz", events: ["wedding"] },
       ],
     },
-    {
-      partyName: "Brown",
+    { // 14
+      partyName: "Louis Duguay",
       members: [
-        { name: "David Brown", events: ["wedding"] },
-        { name: "Laura Brown", events: ["wedding"] },
-        { name: "Timmy Brown", events: ["wedding"] },
+        { name: "Louis Duguay", events: ["wedding"] },
+        { name: "Judith Tetreault", events: ["wedding"] },
       ],
     },
-    {
-      partyName: "Wilson",
+    { // 15
+      partyName: "Brian Winter",
       members: [
-        { name: "Emma Wilson", events: ["wedding"] },
-        { name: "James Wilson", events: ["wedding"] },
+        { name: "Brian Winter", events: ["wedding"] },
+        { name: "Robin Winter", events: ["wedding"] },
+        { name: "Eva Winter", events: ["wedding"] },
       ],
     },
-    // ➕ Add more parties here:
-    // {
-    //   partyName: "LastName",
-    //   members: [
-    //     { name: "First Last", events: ["wedding"] },
-    //   ],
-    // },
+    { // 16
+      partyName: "Kayla Teixeira",
+      members: [
+        { name: "Kayla Teixeira", events: ["wedding"] },
+        { name: "Victor Teixeira", events: ["wedding"] },
+        { name: "Costin Teixeira", events: ["wedding"] },
+        { name: "Adalee Teixeira", events: ["wedding"] },
+      ],
+    },
+    { // 17 — Christopher Winter family
+      partyName: "Christopher Winter",
+      members: [
+        { name: "Christopher Winter", events: ["wedding"] },
+        { name: "Sarah Winter", events: ["wedding"] },
+        { name: "Jackson Winter", events: ["wedding"] },
+        { name: "Kennedy Winter", events: ["wedding"] },
+        { name: "Emerson Winter", events: ["wedding"] },
+      ],
+    },
+    { // 17 — Keller & Gardner
+      partyName: "Leandra Keller",
+      members: [
+        { name: "Leandra Keller", events: ["wedding"] },
+        { name: "Jesse Gardner", events: ["wedding"] },
+      ],
+    },
+    { // 18
+      partyName: "Kirk Webster",
+      members: [
+        { name: "Kirk Webster", events: ["wedding"] },
+        { name: "Simone Gaudreault", events: ["wedding"] },
+      ],
+    },
+    { // 19
+      partyName: "Mike Onyeaju",
+      members: [
+        { name: "Aimee Dagenais-Onyeaju", events: ["wedding"] },
+        { name: "Mike Onyeaju", events: ["wedding"] },
+      ],
+    },
+    { // 20
+      partyName: "Luke Morneau",
+      members: [
+        { name: "Luke Morneau", events: ["wedding"] },
+        { name: "Chelsea Morneau", events: ["wedding"] },
+      ],
+    },
+    { // 21
+      partyName: "Tim Gull",
+      members: [
+        { name: "Tim Gull", events: ["wedding"] },
+        { name: "Savannah Muller", events: ["wedding"] },
+      ],
+    },
+    { // 22
+      partyName: "Colin MacNeil",
+      members: [
+        { name: "Danijela MacNeil", events: ["wedding"] },
+        { name: "Colin MacNeil", events: ["wedding"] },
+      ],
+    },
+    { // 23
+      partyName: "Kyle Nash",
+      members: [
+        { name: "Kyle Nash", events: ["wedding"] },
+        { name: "Julie Morissette", events: ["wedding"] },
+      ],
+    },
+    { // 24
+      partyName: "Brendon Doris",
+      members: [
+        { name: "Brendon Doris", events: ["wedding"] },
+        { name: "Kim Doris", events: ["wedding"] },
+      ],
+    },
+    { // 25
+      partyName: "Michael Urgulo",
+      members: [
+        { name: "Michael Urgulo", events: ["wedding"] },
+        { name: "Rita Luo", events: ["wedding"] },
+      ],
+    },
+    { // 26
+      partyName: "Chris Taylor",
+      members: [
+        { name: "Katie Leblanc", events: ["wedding"] },
+        { name: "Chris Taylor", events: ["wedding"] },
+      ],
+    },
+    { // 27
+      partyName: "Cuffari",
+      members: [
+        { name: "Cuffari", events: ["wedding"] },
+        { name: "Kim", events: ["wedding"] },
+      ],
+    },
+    { // 28
+      partyName: "Justin",
+      members: [
+        { name: "Justin", events: ["wedding"] },
+        { name: "Lucy", events: ["wedding"] },
+      ],
+    },
+    { // 29
+      partyName: "Shannon Hodgins",
+      members: [
+        { name: "Shannon Hodgins", events: ["wedding"] },
+        { name: "Sean", events: ["wedding"] },
+        { name: "Taylor O'Connor", events: ["wedding"] },
+        { name: "Dallas", events: ["wedding"] },
+      ],
+    },
+    { // 30
+      partyName: "Ron Hodgins",
+      members: [
+        { name: "Lynn Hodgins", events: ["wedding"] },
+        { name: "Ron Hodgins", events: ["wedding"] },
+      ],
+    },
+    { // 31
+      partyName: "Joe",
+      members: [
+        { name: "Joe", events: ["wedding"] },
+        { name: "Nicki", events: ["wedding"] },
+      ],
+    },
+    { // 32
+      partyName: "Josh",
+      members: [
+        { name: "Grace", events: ["wedding"] },
+        { name: "Jack", events: ["wedding"] },
+        { name: "Kai land", events: ["wedding"] },
+        { name: "Josh", events: ["wedding"] },
+        { name: "Heather", events: ["wedding"] },
+      ],
+    },
+    { // 33
+      partyName: "Dave McCoppen",
+      members: [
+        { name: "Dave McCoppen", events: ["wedding"] },
+        { name: "Amanda Rose", events: ["wedding"] },
+      ],
+    },
+    { // 34
+      partyName: "Warren",
+      members: [
+        { name: "Warren", events: ["wedding"] },
+        { name: "Warren wife", events: ["wedding"] },
+      ],
+    },
+    { // 35
+      partyName: "Adrian",
+      members: [
+        { name: "Adrian", events: ["wedding"] },
+        { name: "Adrian wife", events: ["wedding"] },
+      ],
+    },
+    { // 36
+      partyName: "Lou",
+      members: [
+        { name: "Lee", events: ["wedding"] },
+        { name: "Lou", events: ["wedding"] },
+      ],
+    },
+    { // 37
+      partyName: "Jack",
+      members: [
+        { name: "Jill", events: ["wedding"] },
+        { name: "Jack", events: ["wedding"] },
+      ],
+    },
+    { // 38
+      partyName: "Rob",
+      members: [
+        { name: "Brett", events: ["wedding"] },
+        { name: "Lisa", events: ["wedding"] },
+        { name: "Rob", events: ["wedding"] },
+      ],
+    },
+    { // 39
+      partyName: "Mark Johnson",
+      members: [
+        { name: "Deb Johnson", events: ["wedding"] },
+        { name: "Mark Johnson", events: ["wedding"] },
+        { name: "Jack Johnson", events: ["wedding"] },
+        { name: "Emily Blake Johnson", events: ["wedding"] },
+        { name: "Michael Johnson", events: ["wedding"] },
+      ],
+    },
+    { // 40
+      partyName: "Lori",
+      members: [
+        { name: "Lori", events: ["wedding"] },
+      ],
+    },
   ],
-
   // ─── TRAVEL & ACCOMMODATIONS ─────────────────────────────────────────────────
   hotels: [
     {
       name: "Brookstreet Hotel",
       description: "We've reserved a room block at the Brookstreet Hotel for our wedding guests. It's a beautiful hotel in Kanata that makes a great home base for the weekend, with easy access to Ottawa and a comfortable drive to the venue.",
       address: "525 Legget Dr, Ottawa, ON K2K 2W2",
-      bookingUrl: "https://www.brookstreethotel.com",
+      bookingUrl: "https://bookings.travelclick.com/13193?groupID=5125649",
       rateInfo: "",    // e.g., "$199 CAD/night — group rate until August 1, 2026"
     },
   ],
   bookingInstructions: [
-    // ⚠️ TODO: Confirm the exact group rate code and group name with Brookstreet Hotel
-    // before sharing this site with guests. Replace these placeholder codes if needed.
-    "Call <strong>(613) 271-1800</strong> or visit <a href='https://www.brookstreethotel.com' target='_blank' style='color:#b8895a'>brookstreethotel.com</a> and mention the <strong>Hodgins-Duguay Wedding</strong> (or use code <strong>HODGINS2026</strong>) to access our group rate.",
-    "Please book by <strong>August 1, 2026</strong> to guarantee the discounted rate.",
+    "You can <a href='https://bookings.travelclick.com/13193?groupID=5125649' target='_blank' style='color:#b8895a'><strong>book online</strong></a> using our dedicated group link.",
+    "Or you can <strong>email</strong> <a href='mailto:reservations@brookstreet.com' style='color:#b8895a'>reservations@brookstreet.com</a> or <strong>call</strong> <a href='tel:6132711800' style='color:#b8895a'>(613) 271-1800</a> and mention the <strong>Duguay + Hodgins Wedding Block</strong>.",
+    "Book by <strong>June 20, 2026</strong> to guarantee the group rate.",
   ],
 
   // ─── GIFTS ────────────────────────────────────────────────────────────────────
   // A gentle note about gifts — no pressure, no awkward payment info upfront.
   // If guests want to give, they'll reach out and ask!
   registryTitle: "Gifts",
-  registryMessage: "Your presence is our gift — seriously! We kindly ask for no boxed gifts. There will be a card table at the reception if you'd like to leave a card. That's all we could ever ask for.",
+  registryMessage: "Your presence at our wedding is the greatest gift! We kindly ask for no boxed gifts. A card table will be set up at the reception for any monetary gifts, which will go toward our honeymoon and starting our life together.",
   registryNote: "",
 
   // ─── FAQs ────────────────────────────────────────────────────────────────────
   faqs: [
     { q: "When should I RSVP by?", a: "Please RSVP by <strong>June 14, 2026</strong> so we can finalize our headcount with the caterers and venue. The RSVP form on this website will close after that date, so please don't leave it to the last minute!" },
     { q: "What is the dress code?", a: "Smart Casual — think sundresses, slacks, and button-downs. The ceremony is on grass, so dress for an outdoor celebration!" },
-    { q: "Is the wedding indoors or outdoors?", a: "Both! The ceremony will be outdoors on the grounds of Lavender Ridge Farm — think lavender fields and open skies. The reception takes place in and around the timber-frame barn with a string-lit patio. We'll have covered areas in case of rain, but fingers crossed for beautiful weather!" },
-    { q: "What time should I arrive?", a: "Please arrive by 4:00 PM so you have time to find a seat and settle in. The ceremony begins at 4:30 PM sharp." },
+    { q: "Is the wedding indoors or outdoors?", a: "Both! The ceremony will be outdoors on the grounds of Lavender Ridge Farm. The reception takes place in and around the timber-frame barn with a string-lit patio. We'll have covered areas in case of rain, but fingers crossed for beautiful weather!" },
+    { q: "What time should I arrive?", a: "Please arrive by 4:30 PM so you have time to find a seat and settle in. The ceremony begins at 5:00 PM sharp." },
     { q: "What kind of food will be served?", a: "We're serving a delicious BBQ-style dinner with plenty of options. If you have dietary restrictions or allergies, please note them in your RSVP and we'll make sure you're taken care of." },
     { q: "Can I bring a plus one?", a: "Due to venue capacity, we can only accommodate guests who are named on the invitation. If you've been given a plus one, their name will appear in your party's RSVP." },
     { q: "Will there be parking at the venue?", a: "Yes! Free parking is available right on the farm property. The lot is on grass and gravel — see the footwear question below for more on what to wear." },
     { q: "How do I get to the venue?", a: "The venue is about 45 minutes southwest of downtown Ottawa. We are not providing a shuttle service, so please plan your transportation accordingly. We recommend carpooling with friends or family, or arranging a rideshare if you'd prefer not to drive. The Brookstreet Hotel (where our room block is) is about 30 minutes from the venue." },
     { q: "What should I wear on my feet?", a: "The ceremony and parts of the reception are on grass and gravel, so stilettos are not your friend here! We recommend wedges, flats, block heels, or dressy sandals. Comfort is key — there will be dancing!" },
-    { q: "Do you have a registry?", a: "No registry! Your presence is our gift. We kindly ask for no boxed gifts. If you'd like to bring a card, there will be a card table at the reception." },
-    { q: "Who should I contact the day of the wedding?", a: "If you need anything on the wedding day, please reach out to our day-of coordinator (we'll share their name and number closer to the date). Please avoid calling us directly — we'll be a little busy! 😊" },
+    { q: "Do you have a registry?", a: "No registry! Your presence at our wedding is the greatest gift. We kindly ask for no boxed gifts, a card table will be set up at the reception for any monetary gifts, which will go toward our honeymoon and starting our life together." },
+    { q: "Who should I contact the day of the wedding?", a: "If you need anything on the wedding day, please reach out to our day-of coordinator, Shannon Hodgins, on her cell: <a href='tel:6138826563' style='color:#b8895a'>613-882-6563</a>. Please avoid calling us directly — we'll be a little busy! 😊" },
     // ➕ Add more FAQs here
   ],
 
@@ -655,7 +906,7 @@ function renderSite() {
           </dd>
         </div>
       </dl>
-      <p class="wedding-desc">${ev.description}</p>
+      ${ev.description ? `<p class="wedding-desc">${ev.description}</p>` : ""}
     </div>`;
 
   // Inline RSVP form (no separate section)
@@ -676,8 +927,8 @@ function renderSite() {
       ` : `
       <div class="rsvp-form" id="rsvp-form">
         <label>
-          <span class="label-text">Enter your last name to find your party</span>
-          <input type="text" id="party-search" placeholder="e.g. Smith" autocomplete="off">
+          <span class="label-text">Enter your name to find your party</span>
+          <input type="text" id="party-search" placeholder="e.g. Sarah Winter" autocomplete="off">
         </label>
         <div id="party-results"></div>
         <div id="rsvp-party-form" style="display:none">
@@ -732,7 +983,6 @@ function renderSite() {
         <p>${h.description}</p>
         <p style="font-size:13px;color:#7a7268;font-weight:300;margin-top:8px">${h.address}</p>
         ${h.rateInfo ? `<p class="rate">${h.rateInfo}</p>` : ""}
-        ${h.bookingUrl ? `<a href="${h.bookingUrl}" target="_blank" class="book-link">Visit Hotel Website →</a>` : ""}
       </div>
     </div>`;
   });
@@ -741,7 +991,7 @@ function renderSite() {
     steps = `<div class="booking-steps"><h4>How to Book</h4>${CONFIG.bookingInstructions.map(s=>`<p>${s}</p>`).join("")}</div>`;
   }
   html += `<section id="travel" class="section fade-section">
-    <div class="section-title"><h2>Where to Stay</h2><p class="sub">We've reserved a room block for our guests</p><div class="line"></div></div>
+    <div class="section-title"><h2>Where to Stay</h2><div class="line"></div></div>
     ${hotelCards}${steps}
   </section>`;
 
@@ -814,10 +1064,14 @@ function initSiteLogic() {
     if (val.length < 2) { partyResults.innerHTML = ""; return; }
 
     searchTimeout = setTimeout(() => {
-      const matches = CONFIG.guestParties.filter(p => p.partyName.toLowerCase().includes(val));
+      const matches = CONFIG.guestParties.filter(p => {
+        // Match against party name and all member names
+        const searchable = [p.partyName, ...p.members.map(m => m.name)].join(" ").toLowerCase();
+        return searchable.includes(val);
+      });
 
       if (matches.length === 0) {
-        partyResults.innerHTML = `<p class="rsvp-no-match">We couldn't find a party under that name. Please try a different spelling, or <a href="mailto:${CONFIG.contactEmail || ''}">contact us</a> for help.</p>`;
+        partyResults.innerHTML = `<p class="rsvp-no-match">We couldn't find your name on the guest list. Please try a different spelling, or <a href="mailto:${CONFIG.contactEmail || ''}">contact us</a> for help.</p>`;
       } else if (matches.length === 1) {
         selectParty(matches[0]);
         partyResults.innerHTML = "";
@@ -845,10 +1099,8 @@ function initSiteLogic() {
     const isSingleEvent = CONFIG.events.length === 1;
     const isMultiMember = party.members.length > 1;
     let membersHtml = `<h3 class="rsvp-party-header">The ${party.partyName} Party</h3>`;
-    if (isSingleEvent && isMultiMember) {
-      membersHtml += `<p style="font-size:14px;color:#7a7268;font-weight:300;line-height:1.6;margin-bottom:16px">Please let us know who will be joining us on <strong style="color:#3a3530;font-weight:500">${CONFIG.events[0].date}</strong>. You can respond for everyone or just yourself — anyone left unanswered can RSVP later.</p>`;
-    } else if (isSingleEvent) {
-      membersHtml += `<p style="font-size:14px;color:#7a7268;font-weight:300;line-height:1.6;margin-bottom:16px">Please let us know whether you'll be joining us on <strong style="color:#3a3530;font-weight:500">${CONFIG.events[0].date}</strong>.</p>`;
+    if (isSingleEvent) {
+      membersHtml += `<p style="font-size:14px;color:#7a7268;font-weight:300;line-height:1.6;margin-bottom:16px">Please let us know who will be joining us. If there are others in your party, you can respond for everyone or just yourself — anyone left unanswered can RSVP later until the deadline.</p>`;
     }
 
     party.members.forEach((member, idx) => {
@@ -859,7 +1111,6 @@ function initSiteLogic() {
       memberEvents.forEach(ev => {
         if (isSingleEvent) {
           eventRows += `<div class="rsvp-event-row">
-            <span class="ev-label">Will you be joining us?</span>
             <div class="rsvp-btns">
               <button class="rsvp-btn" data-member="${member.name}" data-event="${ev.id}" data-val="accept" onclick="setPartyResponse(this)">Joyfully Accepts</button>
               <button class="rsvp-btn" data-member="${member.name}" data-event="${ev.id}" data-val="decline" onclick="setPartyResponse(this)">Regretfully Declines</button>
