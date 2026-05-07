@@ -217,6 +217,9 @@ body { font-family: 'Manrope', sans-serif; color: #3a3530; background: #fff; -we
 .hotel-card p { font-size:14px; color:#7a7268; font-weight:300; line-height:1.6; }
 .hotel-card .rate { font-size:13px; color:#b8895a; font-weight:400; margin-top:4px; }
 .hotel-card a.book-link { display:inline-block; margin-top:12px; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:#3a3530; border-bottom:1px solid #d4b88f; text-decoration:none; padding-bottom:2px; font-weight:400; }
+.hotel-card .map-link { display:inline-block; margin-top:8px; color:#b8895a; text-decoration:none; border-bottom:1px solid #d4b88f; padding-bottom:1px; transition:color 0.2s, border-color 0.2s; font-size:14px; font-weight:300; }
+.hotel-card .map-link:hover { color:#3a3530; border-color:#3a3530; }
+.hotel-card .map-link .map-arrow { font-size:12px; }
 @media (max-width:480px) {
   .hotel-card .hotel-body { padding:20px; }
   .hotel-card h3 { font-size:20px; }
@@ -707,6 +710,7 @@ const CONFIG = {
       name: "Brookstreet Hotel",
       description: "We've reserved a room block at the Brookstreet Hotel for our wedding guests. It's a beautiful hotel in Kanata that makes a great home base for the weekend, with easy access to Ottawa and a comfortable drive to the venue.",
       address: "525 Legget Dr, Ottawa, ON K2K 2W2",
+      mapsUrl: "https://www.google.com/maps/place/Brookstreet+Hotel/@45.3455,-75.9101,17z",
       bookingUrl: "https://bookings.travelclick.com/13193?groupID=5125649",
       rateInfo: "",    // e.g., "$199 CAD/night — group rate until August 1, 2026"
     },
@@ -981,7 +985,9 @@ function renderSite() {
       <div class="hotel-body">
         <h3>${h.name}</h3>
         <p>${h.description}</p>
-        <p style="font-size:13px;color:#7a7268;font-weight:300;margin-top:8px">${h.address}</p>
+        ${h.mapsUrl
+          ? `<a href="${h.mapsUrl}" target="_blank" rel="noopener" class="map-link">${h.address}<span class="map-arrow"> ↗</span></a>`
+          : `<p style="font-size:13px;color:#7a7268;font-weight:300;margin-top:8px">${h.address}</p>`}
         ${h.rateInfo ? `<p class="rate">${h.rateInfo}</p>` : ""}
       </div>
     </div>`;
