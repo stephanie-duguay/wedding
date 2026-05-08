@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Manrope:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -181,20 +182,30 @@ body { font-family: 'Manrope', sans-serif; color: #3a3530; background: #fff; -we
 .rsvp-event-row:last-child { border-bottom:none; }
 .rsvp-event-row .ev-label { font-size:14px; color:#3a3530; font-weight:400; flex:1 1 200px; }
 .rsvp-event-row .ev-sub { font-size:12px; color:#7a7268; font-weight:300; }
-.rsvp-btns { display:flex; gap:8px; flex-shrink:0; }
-.rsvp-btn { padding:8px 14px; font-family:'Manrope',sans-serif; font-size:12px; font-weight:400; letter-spacing:0.06em; text-transform:uppercase; cursor:pointer; border:1px solid #ddd; background:#fff; color:#7a7268; transition:all 0.2s; }
-.rsvp-btn.accept-selected { border-color:#d4b88f; background:#faf6ef; color:#b8895a; }
-.rsvp-btn.decline-selected { border-color:#ccc; background:#f5f5f5; color:#7a7268; }
-@media (max-width:400px) {
-  .rsvp-event-row { flex-direction:column; align-items:flex-start; gap:8px; }
-  .rsvp-btns { width:100%; }
-  .rsvp-btn { flex:1; text-align:center; padding:10px 8px; font-size:11px; }
-  .rsvp-member-card { padding:16px; }
-}
-#rsvp-submit { width:100%; padding:16px; font-family:'Manrope',sans-serif; font-size:13px; font-weight:400; letter-spacing:0.15em; text-transform:uppercase; cursor:pointer; background:#3a3530; color:#fff; border:none; transition:background 0.3s; }
+.rsvp-btns { display:flex; flex-direction:column; gap:8px; width:100%; }
+.rsvp-btn { display:flex; align-items:center; gap:12px; width:100%; padding:16px 18px; font-family:'Manrope',sans-serif; font-size:15px; font-weight:400; cursor:pointer; border:1.5px solid #ddd; background:#fff; color:#3a3530; transition:all 0.2s; text-align:left; letter-spacing:0; text-transform:none; }
+.rsvp-btn .rsvp-icon { font-size:18px; flex-shrink:0; }
+.rsvp-btn:hover { border-color:#b8895a; background:#fdf9f4; }
+.rsvp-btn.accept-selected { border-color:#b8895a; background:#faf6ef; color:#3a3530; font-weight:500; }
+.rsvp-btn.decline-selected { border-color:#999; background:#f7f7f7; color:#7a7268; font-weight:500; }
+.rsvp-member-card { margin-bottom:16px; padding:20px 24px; background:#fff; border:1px solid #ebe4d4; transition:all 0.3s; }
+.rsvp-member-card .member-name { font-family:'Manrope',sans-serif; font-size:16px; font-weight:500; margin-bottom:14px; color:#3a3530; }
+.rsvp-allergy-row { margin-top:12px; }
+.rsvp-allergy-row label { display:flex; align-items:center; gap:8px; cursor:pointer; font-family:'Manrope',sans-serif; font-size:13px; color:#7a7268; font-weight:300; }
+.rsvp-allergy-row input[type="checkbox"] { width:16px; height:16px; accent-color:#b8895a; cursor:pointer; flex-shrink:0; }
+.rsvp-allergy-row input[type="text"] { margin-top:8px; font-family:'Manrope',sans-serif; font-size:13px; padding:10px 14px; border:1px solid #ddd; outline:none; width:100%; background:#fff; font-weight:300; transition:border-color 0.2s; }
+.rsvp-allergy-row input[type="text"]:focus { border-color:#b8895a; }
+.rsvp-submit-section { margin-top:24px; padding-top:20px; border-top:1px solid #ebe4d4; text-align:center; }
+.rsvp-submit-section .submit-hint { font-size:13px; color:#7a7268; font-weight:300; margin-bottom:12px; line-height:1.5; }
+.rsvp-submit-section .submit-hint strong { font-weight:500; color:#3a3530; }
+#rsvp-submit { width:100%; padding:16px; font-family:'Manrope',sans-serif; font-size:14px; font-weight:400; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; background:#3a3530; color:#fff; border:none; transition:background 0.3s; }
 #rsvp-submit:hover { background:#b8895a; }
 #rsvp-submit:disabled { opacity:0.6; cursor:wait; }
 .rsvp-error { color:#c44; font-size:13px; text-align:center; margin-bottom:12px; min-height:18px; }
+@media (max-width:400px) {
+  .rsvp-btn { padding:14px 14px; font-size:14px; }
+  .rsvp-member-card { padding:16px; }
+}
 #rsvp-thankyou { text-align:center; padding:40px 0; }
 #rsvp-thankyou .ty-emoji { font-size:48px; margin-bottom:16px; }
 #rsvp-thankyou h2 { font-family:'Cormorant Garamond',serif; font-size:36px; font-weight:400; margin-bottom:16px; color:#3a3530; }
@@ -377,7 +388,7 @@ const CONFIG = {
     websiteUrl: "https://www.lavenderridgefarm.ca/",
     directions: "Lavender Ridge Farm is located at 2584 Upper Dwyer Hill Rd, Ottawa, Ontario K0A 1L0. It's about 45 minutes southwest of downtown Ottawa. From Highway 417, take the Dwyer Hill Road exit and head south — the farm will be on your right. Keep an eye out for the lavender sign!",
     parkingInfo: "Free parking is available right on the farm property. The lot is on grass and gravel — please plan your footwear accordingly for the walk to the ceremony area.",
-    mapsUrl: "https://www.google.com/maps/@45.3088305,-76.1768658,15z",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Lavender+Ridge+Farm+2584+Upper+Dwyer+Hill+Rd+Ottawa+ON",
   },
 
   // ─── TIMELINE (wedding day) ──────────────────────────────────────────────────
@@ -710,7 +721,7 @@ const CONFIG = {
       name: "Brookstreet Hotel",
       description: "We've reserved a room block at the Brookstreet Hotel for our wedding guests. It's a beautiful hotel in Kanata that makes a great home base for the weekend, with easy access to Ottawa and a comfortable drive to the venue.",
       address: "525 Legget Dr, Ottawa, ON K2K 2W2",
-      mapsUrl: "https://www.google.com/maps/place/Brookstreet+Hotel/@45.3455,-75.9101,17z",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Brookstreet+Hotel+525+Legget+Dr+Ottawa+ON",
       bookingUrl: "https://bookings.travelclick.com/13193?groupID=5125649",
       rateInfo: "",    // e.g., "$199 CAD/night — group rate until August 1, 2026"
     },
@@ -740,6 +751,7 @@ const CONFIG = {
     { q: "How do I get to the venue?", a: "The venue is about 45 minutes southwest of downtown Ottawa. We are not providing a shuttle service, so please plan your transportation accordingly. We recommend carpooling with friends or family, or arranging a rideshare if you'd prefer not to drive. The Brookstreet Hotel (where our room block is) is about 30 minutes from the venue." },
     { q: "What should I wear on my feet?", a: "The ceremony and parts of the reception are on grass and gravel, so stilettos are not your friend here! We recommend wedges, flats, block heels, or dressy sandals. Comfort is key — there will be dancing!" },
     { q: "Do you have a registry?", a: "No registry! Your presence at our wedding is the greatest gift. We kindly ask for no boxed gifts, a card table will be set up at the reception for any monetary gifts, which will go toward our honeymoon and starting our life together." },
+    { q: "Who should I contact before the wedding?", a: "For any questions in the lead-up to the big day — RSVPs, travel, accommodations, or anything else — please reach out to Stephanie directly at <a href='mailto:stephanie.duguay@gmail.com' style='color:#b8895a'>stephanie.duguay@gmail.com</a> or <a href='tel:6138675309' style='color:#b8895a'>613-867-5309</a>. We're happy to help!" },
     { q: "Who should I contact the day of the wedding?", a: "If you need anything on the wedding day, please reach out to our day-of coordinator, Shannon Hodgins, on her cell: <a href='tel:6138826563' style='color:#b8895a'>613-882-6563</a>. Please avoid calling us directly — we'll be a little busy! 😊" },
     // ➕ Add more FAQs here
   ],
@@ -937,12 +949,13 @@ function renderSite() {
         <div id="party-results"></div>
         <div id="rsvp-party-form" style="display:none">
           <div id="rsvp-members"></div>
-          <label style="margin-top:24px">
-            <span class="label-text">Dietary restrictions or allergies (for anyone in your party)</span>
-            <textarea id="rsvp-dietary" rows="3" placeholder="Please let us know of any dietary needs…"></textarea>
-          </label>
-          <p class="rsvp-error" id="rsvp-error"></p>
-          <button id="rsvp-submit">Submit RSVP</button>
+          <div id="rsvp-submit-wrap" style="display:none">
+            <div class="rsvp-submit-section">
+              <p class="submit-hint">When you're ready, press <strong>Submit</strong> below to send your RSVP.</p>
+              <p class="rsvp-error" id="rsvp-error"></p>
+              <button id="rsvp-submit">Submit RSVP</button>
+            </div>
+          </div>
         </div>
       </div>
       <div id="rsvp-thankyou" style="display:none">
@@ -1102,73 +1115,86 @@ function initSiteLogic() {
     window._rsvpResponses = {};
     partyForm.style.display = "block";
 
-    const isSingleEvent = CONFIG.events.length === 1;
-    const isMultiMember = party.members.length > 1;
     let membersHtml = `<h3 class="rsvp-party-header">The ${party.partyName} Party</h3>`;
-    if (isSingleEvent) {
-      membersHtml += `<p style="font-size:14px;color:#7a7268;font-weight:300;line-height:1.6;margin-bottom:16px">Please let us know who will be joining us. If there are others in your party, you can respond for everyone or just yourself — anyone left unanswered can RSVP later until the deadline.</p>`;
+    if (party.members.length > 1) {
+      membersHtml += `<p style="font-size:14px;color:#7a7268;font-weight:300;line-height:1.6;margin-bottom:16px">Select a response for each person, then press <strong style="font-weight:500;color:#3a3530">Submit</strong> at the bottom.</p>`;
+    } else {
+      membersHtml += `<p style="font-size:14px;color:#7a7268;font-weight:300;line-height:1.6;margin-bottom:16px">Will you be joining us? Select your response and press <strong style="font-weight:500;color:#3a3530">Submit</strong>.</p>`;
     }
 
+    const ev = CONFIG.events[0];
     party.members.forEach((member, idx) => {
       window._rsvpResponses[member.name] = {};
-      const memberEvents = CONFIG.events.filter(e => member.events.includes(e.id));
-
-      let eventRows = "";
-      memberEvents.forEach(ev => {
-        if (isSingleEvent) {
-          eventRows += `<div class="rsvp-event-row">
-            <div class="rsvp-btns">
-              <button class="rsvp-btn" data-member="${member.name}" data-event="${ev.id}" data-val="accept" onclick="setPartyResponse(this)">Joyfully Accepts</button>
-              <button class="rsvp-btn" data-member="${member.name}" data-event="${ev.id}" data-val="decline" onclick="setPartyResponse(this)">Regretfully Declines</button>
-            </div>
-          </div>`;
-        } else {
-          eventRows += `<div class="rsvp-event-row">
-            <div><span class="ev-label">${ev.name}</span><br><span class="ev-sub">${ev.date} • ${ev.time}</span></div>
-            <div class="rsvp-btns">
-              <button class="rsvp-btn" data-member="${member.name}" data-event="${ev.id}" data-val="accept" onclick="setPartyResponse(this)">Accept</button>
-              <button class="rsvp-btn" data-member="${member.name}" data-event="${ev.id}" data-val="decline" onclick="setPartyResponse(this)">Decline</button>
-            </div>
-          </div>`;
-        }
-      });
-
-      membersHtml += `<div class="rsvp-member-card" id="member-card-${idx}"><div class="member-name">${member.name}</div>${eventRows}</div>`;
+      membersHtml += `<div class="rsvp-member-card" id="member-card-${idx}">
+        <div class="member-name">${member.name}</div>
+        <div class="rsvp-btns">
+          <button class="rsvp-btn" onclick="selectResponse(${idx},'accept')" id="btn-accept-${idx}">
+            <span class="rsvp-icon">🎉</span> Joyfully Accepts
+          </button>
+          <button class="rsvp-btn" onclick="selectResponse(${idx},'decline')" id="btn-decline-${idx}">
+            <span class="rsvp-icon">😔</span> Regretfully Declines
+          </button>
+        </div>
+        <div class="rsvp-allergy-row">
+          <label><input type="checkbox" id="allergy-check-${idx}" onchange="toggleAllergy(${idx})"> Allergies or dietary needs</label>
+          <input type="text" id="allergy-text-${idx}" placeholder="e.g. Nut allergy, vegetarian…" style="display:none">
+        </div>
+      </div>`;
     });
 
     membersDiv.innerHTML = membersHtml;
+
+    // Show submit section
+    document.getElementById("rsvp-submit-wrap").style.display = "block";
   }
 
-  // Submit
+  // Select response (does NOT save yet — just highlights)
+  window.selectResponse = function(idx, val) {
+    const member = currentParty.members[idx];
+    const ev = CONFIG.events[0];
+    const acceptBtn = document.getElementById(`btn-accept-${idx}`);
+    const declineBtn = document.getElementById(`btn-decline-${idx}`);
+
+    acceptBtn.classList.remove('accept-selected', 'decline-selected');
+    declineBtn.classList.remove('accept-selected', 'decline-selected');
+
+    if (val === 'accept') {
+      acceptBtn.classList.add('accept-selected');
+    } else {
+      declineBtn.classList.add('decline-selected');
+    }
+    window._rsvpResponses[member.name] = { [ev.id]: val };
+  };
+
+  window.toggleAllergy = function(idx) {
+    const check = document.getElementById(`allergy-check-${idx}`);
+    const text = document.getElementById(`allergy-text-${idx}`);
+    text.style.display = check.checked ? 'block' : 'none';
+    if (!check.checked) text.value = '';
+  };
+
+  // Submit all responses at once
   document.getElementById("rsvp-submit").addEventListener("click", async () => {
     if (!currentParty) return;
     const errorEl = document.getElementById("rsvp-error");
     errorEl.textContent = "";
 
-    // A member is "answered" if they have a response for ALL their events
-    // A member is "unanswered" if they have NO responses at all
-    // A member is "partial" if they answered some events but not all (error)
+    const ev = CONFIG.events[0];
     const answeredMembers = [];
     const unansweredMembers = [];
 
-    for (const member of currentParty.members) {
-      const memberEvents = CONFIG.events.filter(e => member.events.includes(e.id));
+    for (let i = 0; i < currentParty.members.length; i++) {
+      const member = currentParty.members[i];
       const responses = window._rsvpResponses[member.name] || {};
-      const answeredCount = memberEvents.filter(ev => responses[ev.id]).length;
-
-      if (answeredCount === memberEvents.length) {
-        answeredMembers.push(member);
-      } else if (answeredCount === 0) {
-        unansweredMembers.push(member);
+      if (responses[ev.id]) {
+        answeredMembers.push({ member, idx: i });
       } else {
-        // Partial — they started but didn't finish this member
-        errorEl.textContent = `Please finish responding for ${member.name.split(" ")[0]}, or leave all their options unselected to skip them.`;
-        return;
+        unansweredMembers.push(member);
       }
     }
 
     if (answeredMembers.length === 0) {
-      errorEl.textContent = "Please respond for at least one person in your party.";
+      errorEl.textContent = "Please select a response for at least one person before submitting.";
       return;
     }
 
@@ -1176,97 +1202,81 @@ function initSiteLogic() {
     submitBtn.disabled = true;
     submitBtn.textContent = "Sending…";
 
-    // Only save answered members
     const submittedData = [];
-    for (const member of answeredMembers) {
-      const memberEvents = CONFIG.events.filter(e => member.events.includes(e.id));
+    for (const { member, idx } of answeredMembers) {
+      const allergyText = document.getElementById(`allergy-text-${idx}`);
+      const dietary = allergyText ? allergyText.value.trim() : "";
       const data = {
         guestName: member.name,
         partyName: currentParty.partyName,
-        responses: memberEvents.map(e => ({
-          eventId: e.id, eventName: e.name,
-          attending: window._rsvpResponses[member.name][e.id],
-        })),
-        dietaryRestrictions: document.getElementById("rsvp-dietary").value,
+        responses: [{ eventId: ev.id, eventName: ev.name, attending: window._rsvpResponses[member.name][ev.id] }],
+        dietaryRestrictions: dietary,
         submittedAt: new Date().toISOString(),
       };
       await saveRsvpToSheets(data);
       submittedData.push(data);
     }
 
+    // Show thank you
     document.getElementById("rsvp-form").style.display = "none";
     document.getElementById("rsvp-thankyou").style.display = "block";
-    // Hide the deadline header — no longer relevant after submitting
     const rsvpHeader = document.getElementById("rsvp-header");
     if (rsvpHeader) rsvpHeader.style.display = "none";
-    const firstName = answeredMembers[0].name.split(" ")[0];
+
+    const firstName = answeredMembers[0].member.name.split(" ")[0];
     const isMultiSubmit = answeredMembers.length > 1;
 
-    // Determine whether anyone is attending
     let anyAttending = false, allDeclining = true;
-    for (const member of answeredMembers) {
-      const responses = window._rsvpResponses[member.name] || {};
-      for (const v of Object.values(responses)) {
-        if (v === "accept") { anyAttending = true; allDeclining = false; }
+    for (const d of submittedData) {
+      for (const r of d.responses) {
+        if (r.attending === "accept") { anyAttending = true; allDeclining = false; }
       }
     }
 
     const tyHeadline = document.getElementById("ty-headline");
     const tyMessage = document.getElementById("ty-message");
-    const skippedNote = unansweredMembers.length > 0
-      ? `<p class="ty-secondary">${unansweredMembers.map(m => m.name.split(" ")[0]).join(" and ")} can still RSVP separately using this same website.</p>`
+    const unansweredNames = unansweredMembers.map(m => m.name.split(" ")[0]);
+    const skippedNote = unansweredNames.length > 0
+      ? `<p class="ty-secondary">${unansweredNames.join(" and ")} can still RSVP separately using this same website.</p>`
       : "";
 
     if (anyAttending) {
       tyHeadline.textContent = isMultiSubmit ? "We can't wait to see you!" : `We can't wait to see you, ${firstName}!`;
-      tyMessage.innerHTML = `
-        <p>Thank you${isMultiSubmit ? ` to the ${currentParty.partyName} party` : ""} for your RSVP — we've saved your response.</p>
-        ${skippedNote}
-      `;
+      tyMessage.innerHTML = `<p>Thank you${isMultiSubmit ? ` to the ${currentParty.partyName} party` : ""} for your RSVP — we've received your response.</p>${skippedNote}`;
     } else if (allDeclining) {
       tyHeadline.textContent = "Thank you for letting us know";
-      tyMessage.innerHTML = `
-        <p>We're sorry${isMultiSubmit ? ` the ${currentParty.partyName} party` : ` you, ${firstName},`} won't be able to make it — you'll be missed!</p>
-        ${skippedNote}
-        <p class="ty-secondary">We hope to celebrate with you another time.</p>
-      `;
+      tyMessage.innerHTML = `<p>We're sorry${isMultiSubmit ? ` the ${currentParty.partyName} party` : ` you, ${firstName},`} won't be able to make it — you'll be missed!</p>${skippedNote}<p class="ty-secondary">We hope to celebrate with you another time.</p>`;
     } else {
       tyHeadline.textContent = "Thank you for your RSVP";
-      tyMessage.innerHTML = `
-        <p>We've saved the response for the ${currentParty.partyName} party. We can't wait to celebrate with those of you who can join us!</p>
-        ${skippedNote}
-      `;
+      tyMessage.innerHTML = `<p>We've received the response for the ${currentParty.partyName} party. We can't wait to celebrate with those of you who can join us!</p>${skippedNote}`;
     }
 
-    // Build confirmation actions (email + update note)
-    const actionsEl = document.getElementById("ty-actions");
-    let actionsHtml = "";
-
-    // Build email confirmation summary
-    const eventNames = {}; CONFIG.events.forEach(e => { eventNames[e.id] = e.name; });
-    let summaryLines = [];
+    // Build confirmation data for PDF
+    const responseRows = [];
     submittedData.forEach(d => {
-      const statuses = d.responses.map(r => {
-        const status = r.attending === "accept" ? "Attending" : "Not attending";
-        return CONFIG.events.length > 1 ? `${r.eventName}: ${status}` : status;
+      d.responses.forEach(r => {
+        responseRows.push({ name: d.guestName, attending: r.attending === "accept", dietary: d.dietaryRestrictions || "" });
       });
-      summaryLines.push(`${d.guestName} — ${statuses.join(", ")}`);
     });
-    const dietaryVal = document.getElementById("rsvp-dietary") ? document.getElementById("rsvp-dietary").value : "";
-    if (dietaryVal) summaryLines.push(`\nDietary notes: ${dietaryVal}`);
 
-    const emailSubject = encodeURIComponent(`RSVP Confirmation — ${CONFIG.partner1FirstName} & ${CONFIG.partner2FirstName}'s Wedding`);
-    const emailBody = encodeURIComponent(
-      `Hi ${firstName}!\n\nThis is your RSVP confirmation for ${CONFIG.partner1FirstName} & ${CONFIG.partner2FirstName}'s wedding on ${CONFIG.weddingDate} at ${CONFIG.weddingVenue}.\n\n${summaryLines.join("\n")}\n\nSubmitted on ${new Date().toLocaleDateString()}.\n\nIf you need to make changes, please visit the wedding website or contact us directly.`
-    );
-    actionsHtml += `<a class="ty-email-btn" href="mailto:?subject=${emailSubject}&body=${emailBody}">✉ Email Yourself a Confirmation</a>`;
+    window._confirmationData = {
+      partner1: CONFIG.partner1FirstName,
+      partner2: CONFIG.partner2FirstName,
+      responses: responseRows,
+      date: CONFIG.events[0].date,
+      time: CONFIG.events[0].time,
+      venue: CONFIG.weddingVenue,
+      address: CONFIG.weddingAddress,
+      deadline: CONFIG.rsvpDeadlineDisplay,
+      websiteUrl: window.location.href.split('#')[0],
+    };
 
-    // Update note
+    const actionsEl = document.getElementById("ty-actions");
+    let actionsHtml = `<button class="ty-email-btn" onclick="downloadConfirmation()" style="cursor:pointer">Download Confirmation</button>`;
     const contactLink = CONFIG.contactEmail
       ? `<a href="mailto:${CONFIG.contactEmail}">send us a message</a>`
       : "send us a message";
     actionsHtml += `<p class="ty-update-note">Need to update your RSVP? Just revisit this page and re-enter your last name, or ${contactLink}.</p>`;
-
     actionsEl.innerHTML = actionsHtml;
   });
 
@@ -1281,14 +1291,159 @@ function initSiteLogic() {
   });
 }
 
-// ─── RSVP BUTTON HANDLER ───────────────────────────────────────────────────────
-function setPartyResponse(btn) {
-  const member = btn.dataset.member, eventId = btn.dataset.event, val = btn.dataset.val;
-  const parent = btn.parentElement;
-  parent.querySelectorAll(".rsvp-btn").forEach(b => b.classList.remove("accept-selected","decline-selected"));
-  btn.classList.add(val === "accept" ? "accept-selected" : "decline-selected");
-  if (!window._rsvpResponses[member]) window._rsvpResponses[member] = {};
-  window._rsvpResponses[member][eventId] = val;
+// ─── CONFIRMATION DOWNLOAD ────────────────────────────────────────────────────
+var CONFIRMATION_PHOTO = 'data:image/jpeg;base64,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';
+
+function downloadConfirmation() {
+  if (!window._confirmationData) { alert('No confirmation data found. Please try again.'); return; }
+  if (!window.jspdf) { alert('PDF library is still loading. Please wait a moment and try again.'); return; }
+
+  var btn = document.querySelector('#ty-actions .ty-email-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
+
+  try {
+    var d = window._confirmationData;
+    var jsPDF = window.jspdf.jsPDF;
+
+    var pw = 148, margin = 18, cw = pw - margin * 2, cx = pw / 2;
+
+    // Count rows for height estimation
+    var dietaryRows = 0;
+    d.responses.forEach(function(r) { if (r.dietary) dietaryRows++; });
+    var rowH = 8;
+    var totalH = 150 + d.responses.length * (rowH + 1) + dietaryRows * 6;
+    var ph = Math.max(totalH, 150);
+
+    var pdf = new jsPDF({ unit: 'mm', format: [pw, ph] });
+
+    // Colors
+    var GOLD = [184, 137, 90], DARK = [58, 53, 48], MID = [122, 114, 104];
+    var LINE = [212, 184, 143], BORDER = [235, 228, 212], BG = [247, 244, 239];
+
+    // Background
+    pdf.setFillColor(BG[0], BG[1], BG[2]);
+    pdf.rect(0, 0, pw, ph, 'F');
+
+    // White card
+    pdf.setFillColor(255, 255, 255);
+    pdf.rect(8, 8, pw - 16, ph - 16, 'F');
+    pdf.setDrawColor(BORDER[0], BORDER[1], BORDER[2]);
+    pdf.setLineWidth(0.3);
+    pdf.rect(8, 8, pw - 16, ph - 16, 'S');
+
+    var y = 14;
+
+    // Photo banner
+    try {
+      pdf.addImage(CONFIRMATION_PHOTO, 'JPEG', 10, y, pw - 20, 22, undefined, 'FAST');
+      y += 25;
+    } catch(e) { y += 2; }
+
+    // Couple names
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(18);
+    pdf.setTextColor(DARK[0], DARK[1], DARK[2]);
+    pdf.text(d.partner1 + '  ', cx, y, { align: 'right' });
+    pdf.setFontSize(14);
+    pdf.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
+    pdf.text('&', cx, y, { align: 'center' });
+    pdf.setFontSize(18);
+    pdf.setTextColor(DARK[0], DARK[1], DARK[2]);
+    pdf.text('  ' + d.partner2, cx, y, { align: 'left' });
+    y += 5;
+
+    // Gold line
+    pdf.setDrawColor(LINE[0], LINE[1], LINE[2]);
+    pdf.setLineWidth(0.3);
+    pdf.line(cx - 12, y, cx + 12, y);
+    y += 5;
+
+    // Subtitle
+    pdf.setFontSize(7);
+    pdf.setTextColor(MID[0], MID[1], MID[2]);
+    pdf.text('RSVP CONFIRMATION', cx, y, { align: 'center' });
+    y += 8;
+
+    // Response rows
+    d.responses.forEach(function(r, i) {
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(9.5);
+      pdf.setTextColor(DARK[0], DARK[1], DARK[2]);
+      pdf.text(r.name, margin + 2, y);
+
+      var label = r.attending ? 'ACCEPTS' : 'DECLINES';
+      var bc = r.attending ? GOLD : MID;
+      pdf.setFontSize(5.5);
+      pdf.setTextColor(bc[0], bc[1], bc[2]);
+      var tw = pdf.getTextWidth(label);
+      var bx = pw - margin - 2 - tw - 4;
+      pdf.setDrawColor(bc[0], bc[1], bc[2]);
+      pdf.setLineWidth(0.2);
+      pdf.rect(bx, y - 3, tw + 4, 5, 'S');
+      pdf.text(label, bx + 2, y);
+
+      // Per-person dietary
+      if (r.dietary) {
+        y += 5;
+        pdf.setFontSize(7);
+        pdf.setTextColor(MID[0], MID[1], MID[2]);
+        pdf.setFont('helvetica', 'italic');
+        pdf.text(r.dietary, margin + 6, y);
+        pdf.setFont('helvetica', 'normal');
+      }
+
+      y += rowH;
+
+      if (i < d.responses.length - 1) {
+        pdf.setDrawColor(240, 236, 228);
+        pdf.setLineWidth(0.1);
+        pdf.line(margin, y - 3.5, pw - margin, y - 3.5);
+      }
+    });
+
+    y += 4;
+
+    // Divider
+    pdf.setDrawColor(BORDER[0], BORDER[1], BORDER[2]);
+    pdf.setLineWidth(0.2);
+    pdf.line(margin, y, pw - margin, y);
+    y += 6;
+
+    // When & Where
+    pdf.setFontSize(8.5);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(DARK[0], DARK[1], DARK[2]);
+    pdf.text(d.date + '  ·  ' + d.time, cx, y, { align: 'center' });
+    y += 4.5;
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(MID[0], MID[1], MID[2]);
+    var venueLines = pdf.splitTextToSize(d.venue + '  ·  ' + d.address, cw);
+    pdf.text(venueLines, cx, y, { align: 'center' });
+    y += venueLines.length * 3.5 + 5;
+
+    // Change note
+    pdf.setFontSize(6.5);
+    pdf.text('Need to make changes? Re-enter your last name before ' + d.deadline + '.', cx, y, { align: 'center' });
+    y += 5;
+
+    // Website link
+    pdf.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
+    pdf.setFontSize(6.5);
+    var linkLabel = d.websiteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+    var lw = pdf.getTextWidth(linkLabel);
+    pdf.textWithLink(linkLabel, cx - lw / 2, y, { url: d.websiteUrl });
+    pdf.setDrawColor(GOLD[0], GOLD[1], GOLD[2]);
+    pdf.setLineWidth(0.12);
+    pdf.line(cx - lw / 2, y + 0.5, cx + lw / 2, y + 0.5);
+
+    pdf.save('rsvp-confirmation.pdf');
+  } catch (err) {
+    console.error('PDF generation failed:', err);
+    alert('Something went wrong generating the PDF. Error: ' + err.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Download Confirmation'; }
+  }
 }
 
 // ─── FAQ ───────────────────────────────────────────────────────────────────────
