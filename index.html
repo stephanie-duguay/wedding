@@ -1296,14 +1296,22 @@ var CONFIRMATION_PHOTO = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAAAAAAD/4gH
 
 function downloadConfirmation() {
   if (!window._confirmationData) { alert('No confirmation data found. Please try again.'); return; }
-  if (!window.jspdf) { alert('PDF library is still loading. Please wait a moment and try again.'); return; }
+
+  // jsPDF UMD can export as window.jspdf.jsPDF or window.jsPDF depending on version
+  var JsPDFConstructor = null;
+  if (window.jspdf && window.jspdf.jsPDF) { JsPDFConstructor = window.jspdf.jsPDF; }
+  else if (window.jsPDF) { JsPDFConstructor = window.jsPDF; }
+
+  if (!JsPDFConstructor) {
+    alert('PDF library failed to load. Please check your internet connection and refresh the page.');
+    return;
+  }
 
   var btn = document.querySelector('#ty-actions .ty-email-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
 
   try {
     var d = window._confirmationData;
-    var jsPDF = window.jspdf.jsPDF;
 
     var pw = 148, margin = 18, cw = pw - margin * 2, cx = pw / 2;
 
@@ -1314,7 +1322,7 @@ function downloadConfirmation() {
     var totalH = 150 + d.responses.length * (rowH + 1) + dietaryRows * 6;
     var ph = Math.max(totalH, 150);
 
-    var pdf = new jsPDF({ unit: 'mm', format: [pw, ph] });
+    var pdf = new JsPDFConstructor({ unit: 'mm', format: [pw, ph] });
 
     // Colors
     var GOLD = [184, 137, 90], DARK = [58, 53, 48], MID = [122, 114, 104];
