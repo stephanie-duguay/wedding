@@ -1296,8 +1296,12 @@ function initSiteLogic() {
 }
 
 // ─── CONFIRMATION DOWNLOAD ────────────────────────────────────────────────────
-function downloadConfirmation() {
+async function downloadConfirmation() {
   if (!window._confirmationData) { alert('No confirmation data found.'); return; }
+
+  var btn = document.querySelector('#ty-actions .ty-email-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
+
   var d = window._confirmationData;
 
   var rowsHtml = '';
@@ -1309,7 +1313,31 @@ function downloadConfirmation() {
     rowsHtml += '<div class="row"><span class="guest-name">' + r.name + '</span>' + dietary + '<span class="row-line"></span>' + badge + '</div>';
   });
 
+  // Convert photo to base64 so it survives mobile Safari print
   var photoUrl = CONFIG.confirmationImageUrl || CONFIG.heroImageUrl || '';
+  var photoDataUrl = '';
+  if (photoUrl) {
+    try {
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      await new Promise(function(resolve) {
+        img.onload = resolve;
+        img.onerror = resolve;
+        setTimeout(resolve, 4000);
+        img.src = photoUrl;
+      });
+      if (img.naturalWidth > 0) {
+        var canvas = document.createElement('canvas');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        canvas.getContext('2d').drawImage(img, 0, 0);
+        photoDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      }
+    } catch(e) { photoDataUrl = ''; }
+  }
+
+  if (btn) { btn.textContent = 'Opening…'; }
+
   var siteLabel = d.websiteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '').toUpperCase().replace(/\//g, ' / ');
 
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
@@ -1372,9 +1400,9 @@ function downloadConfirmation() {
     + '</style></head><body>'
     + '<div class="card">';
 
-  if (photoUrl) {
+  if (photoDataUrl) {
     html += '<div class="hero">'
-      + '<img class="hero-img" src="' + photoUrl + '" alt="">'
+      + '<img class="hero-img" src="' + photoDataUrl + '" alt="">'
       + '<div class="hero-gradient"></div>'
       + '<div class="hero-content">'
       + '<p class="h-sub">The Wedding of</p>'
@@ -1413,6 +1441,7 @@ function downloadConfirmation() {
   } else {
     alert('Pop-up was blocked. Please allow pop-ups for this site and try again.');
   }
+  if (btn) { btn.disabled = false; btn.textContent = 'Save Confirmation'; }
 }
 
 // ─── FAQ ───────────────────────────────────────────────────────────────────────
