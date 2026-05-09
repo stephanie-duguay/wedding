@@ -332,7 +332,7 @@ const CONFIG = {
   partner1FullName: "Stephanie Duguay",
   partner2FullName: "Jeffrey Hodgins",
   coupleLastName: "Hodgins & Duguay",
-  contactEmail: "",     // Optional — shown in "contact us" links and for RSVP confirmation emails
+  contactEmail: "",     // Optional — shown in "contact us" links and for firmation emails
 
   // ─── WEDDING DATE & LOCATION ─────────────────────────────────────────────────
   weddingDate: "August 2, 2026",
@@ -1373,7 +1373,7 @@ async function downloadConfirmation() {
       + '</div>';
 
   var bodyHtml = '<div class="body">'
-    + '<div class="rsvp-header"><span class="rh-line"></span><span class="rh-text">RSVP Confirmation</span><span class="rh-line"></span></div>'
+    + '<div class="rsvp-header"><span class="rh-line"></span><span class="rh-text">steph & jeff wedding_rsvp confirmation</span><span class="rh-line"></span></div>'
     + rowsHtml
     + '<div class="event-section">'
     + '<p class="event-datetime">' + d.date + '<span class="dot">&middot;</span>' + d.time + '</p>'
@@ -1436,11 +1436,11 @@ async function downloadConfirmation() {
       var imgDataUrl = canvas.toDataURL('image/png');
       var w = window.open('', '_blank');
       if (w) {
-        w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RSVP Confirmation</title>'
+        w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>steph & jeff wedding_rsvp confirmation</title>'
           + '<style>body{margin:0;background:#e8e3db;display:flex;flex-direction:column;align-items:center;padding:12px;font-family:Arial,sans-serif;}'
           + 'img{width:100%;max-width:520px;display:block;border-radius:2px;}'
           + '.hint{margin-top:14px;font-size:13px;color:#7a7268;text-align:center;line-height:1.5;}</style></head><body>'
-          + '<img src="' + imgDataUrl + '" alt="RSVP Confirmation">'
+          + '<img src="' + imgDataUrl + '" alt="steph & jeff wedding_rsvp confirmation">'
           + '<p class="hint">Press and hold the image to save to your photos.</p>'
           + '</body></html>');
         w.document.close();
