@@ -713,6 +713,13 @@ const CONFIG = {
         { name: "Lori Roussakis", events: ["wedding"] },
       ],
     },
+    { // 41
+      partyName: "Claudia Hunermann",
+      members: [
+        { name: "Claudia Hunermann", events: ["wedding"] },
+        { name: "Claudia Hunermann's +1", events: ["wedding"] },
+      ],
+    },
   ],
   // ─── TRAVEL & ACCOMMODATIONS ─────────────────────────────────────────────────
   hotels: [
@@ -1096,7 +1103,7 @@ function initSiteLogic() {
         partyResults.innerHTML = "";
       } else {
         partyResults.innerHTML = matches.map(p =>
-          `<div style="padding:12px 16px;border:1px solid #eee;margin-bottom:8px;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='#faf6ef'" onmouseout="this.style.background='#fff'" onclick="selectPartyByName('${p.partyName}')">
+          `<div style="padding:12px 16px;border:1px solid #eee;margin-bottom:8px;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='#faf6ef'" onmouseout="this.style.background='#fff'" onclick="selectPartyByName('${p.partyName.replace(/'/g, "\\'")}')">
             <strong style="font-size:15px">The ${p.partyName} Party</strong>
             <span style="font-size:13px;color:#7a7268;margin-left:8px">(${p.members.map(m=>m.name.split(' ')[0]).join(', ')})</span>
           </div>`
