@@ -394,7 +394,7 @@ const CONFIG = {
   weddingDayDate: "Sunday, August 2, 2026",  // Shown in the timeline header
   timeline: [
     { time: "4:00 PM", label: "Guest Arrival" },
-    { time: "5:00 PM", label: "Ceremony Begins" },
+    { time: "4:30 PM", label: "Ceremony Begins" },
     { time: "5:30 PM", label: "Cocktail Hour & Lawn Games" },
     { time: "6:30 PM", label: "BBQ Dinner Served" },
     { time: "8:30 PM", label: "Dancing & Celebration" },
@@ -741,16 +741,16 @@ const CONFIG = {
   // ─── FAQs ────────────────────────────────────────────────────────────────────
   faqs: [
     { q: "When should I RSVP by?", a: "Please RSVP by <strong>June 14, 2026</strong> so we can finalize our headcount with the caterers and venue. The RSVP form on this website will close after that date, so please don't leave it to the last minute!" },
-    { q: "What is the dress code?", a: "Smart Casual — think sundresses, slacks, and button-downs. The ceremony is on grass, so dress for an outdoor celebration!" },
+    { q: "What is the dress code?", a: "Semi-Formal. For women, think cocktail or midi dresses; for men, dress slacks with a blazer or a suit." },
     { q: "Is the wedding indoors or outdoors?", a: "Both! The ceremony will be outdoors on the grounds of Lavender Ridge Farm. The reception takes place in and around the timber-frame barn with a string-lit patio. We'll have covered areas in case of rain, but fingers crossed for beautiful weather!" },
-    { q: "What time should I arrive?", a: "Please arrive by 4:30 PM so you have time to find a seat and settle in. The ceremony begins at 5:00 PM sharp." },
+    { q: "What time should I arrive?", a: "Please arrive by 4:00 PM so you have time to find a seat and settle in. The ceremony begins at 4:30 PM sharp." },
     { q: "What kind of food will be served?", a: "We're serving a delicious BBQ-style dinner with plenty of options. If you have dietary restrictions or allergies, please note them in your RSVP and we'll make sure you're taken care of." },
     { q: "Can I bring a plus one?", a: "Due to venue capacity, we can only accommodate guests who are named on the invitation. If you've been given a plus one, their name will appear in your party's RSVP." },
     { q: "Will there be parking at the venue?", a: "Yes! Free parking is available right on the farm property. The lot is on grass and gravel — see the footwear question below for more on what to wear." },
     { q: "How do I get to the venue?", a: "The venue is about 45 minutes southwest of downtown Ottawa. We are not providing a shuttle service, so please plan your transportation accordingly. We recommend carpooling with friends or family, or arranging a rideshare if you'd prefer not to drive. The Brookstreet Hotel (where our room block is) is about 30 minutes from the venue." },
     { q: "What should I wear on my feet?", a: "The ceremony and parts of the reception are on grass and gravel, so stilettos are not your friend here! We recommend wedges, flats, block heels, or dressy sandals. Comfort is key — there will be dancing!" },
     { q: "Do you have a registry?", a: "No registry! Your presence at our wedding is the greatest gift. We kindly ask for no boxed gifts, a card table will be set up at the reception for any monetary gifts, which will go toward our honeymoon and starting our life together." },
-    { q: "Who should I contact before the wedding?", a: "For any questions in the lead-up to the big day (RSVPs, travel, accommodations, or anything else) please reach out to Claudia on her cell <a href='tel:6133623909' style='color:#b8895a'>613-362-3909</a>." },
+    { q: "Who should I contact before the wedding?", a: "For any questions in the lead-up to the big day (RSVPs, travel, accommodations, or anything else) please reach out to Claudia Duguay on her cell <a href='tel:6133623909' style='color:#b8895a'>613-362-3909</a>." },
     { q: "Who should I contact the day of the wedding?", a: "If you need anything on the wedding day, please reach out to our day-of coordinator, Shannon Hodgins, on her cell: <a href='tel:6138826563' style='color:#b8895a'>613-882-6563</a>. Please avoid calling us directly — we'll be a little busy! 😊" },
     // ➕ Add more FAQs here
   ],
@@ -1310,84 +1310,96 @@ function downloadConfirmation() {
   });
 
   var photoUrl = CONFIG.confirmationImageUrl || CONFIG.heroImageUrl || '';
-  var photoHtml = photoUrl ? '<img class="hero-img" src="' + photoUrl + '">' : '';
+  var hasPhoto = !!photoUrl;
   var siteLabel = d.websiteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '').toUpperCase().replace(/\//g, ' / ');
 
-  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-    + '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">'
-    + '<title>RSVP Confirmation — ' + d.partner1 + ' & ' + d.partner2 + '</title>'
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
+    + '<title>RSVP Confirmation</title>'
     + '<style>'
+    // Embed font references with preload hints
+    + '@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap");'
     + '*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }'
-    + 'html, body { background:#f7f4ef; }'
-    + '@page { size: 130mm auto; margin: 0; }'
-    + '.card { max-width:520px; margin:0 auto; background:#fffdf9; font-family:"Manrope",sans-serif; }'
-    + '@media print { body { background:#fff; } .card { max-width:100%; } .save-bar { display:none !important; } }'
+    + 'body { background:#f7f4ef; font-family:"Manrope",Arial,sans-serif; }'
+    + '@page { margin:0; }'
+    + '@media print { body { background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; } .save-bar { display:none !important; } }'
 
-    + '.hero { position:relative; width:100%; height:0; padding-bottom:92%; overflow:hidden; }'
-    + '.hero-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; object-position:center 20%; }'
-    + '.hero-fade { position:absolute; bottom:0; left:0; right:0; height:55%; background:linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%); }'
-    + '.hero-content { position:absolute; bottom:32px; left:0; right:0; text-align:center; color:#fff; z-index:2; padding:0 32px; }'
-    + '.h-sub { font-size:10px; letter-spacing:0.35em; text-transform:uppercase; margin-bottom:10px; font-weight:400; opacity:0.9; }'
-    + '.h-names { font-family:"Cormorant Garamond",serif; font-size:48px; font-weight:300; line-height:1.1; }'
-    + '.h-names .amp { font-style:italic; color:#d4b88f; font-size:40px; margin:0 2px; }'
-    + '.h-line { width:36px; height:1.5px; background:rgba(255,255,255,0.5); margin:16px auto; }'
-    + '.h-tagline { font-family:"Cormorant Garamond",serif; font-style:italic; font-size:16px; font-weight:300; opacity:0.92; line-height:1.5; }'
-    + '.no-photo .hero { display:none; }'
-    + '.no-photo .fallback-header { display:block; }'
-    + '.fallback-header { display:none; text-align:center; padding:40px 32px 20px; }'
-    + '.fallback-header .h-sub { font-size:10px; letter-spacing:0.35em; text-transform:uppercase; color:#8c857c; margin-bottom:8px; }'
-    + '.fallback-header .h-names { font-family:"Cormorant Garamond",serif; font-size:42px; font-weight:300; color:#3a3530; line-height:1.1; }'
-    + '.fallback-header .h-names .amp { color:#b8895a; }'
-    + '.fallback-header .h-line { background:#d4b88f; margin:14px auto; }'
-    + '.fallback-header .h-tagline { font-family:"Cormorant Garamond",serif; font-style:italic; font-size:15px; color:#8c857c; font-weight:300; }'
+    + '.card { max-width:520px; margin:0 auto; background:#fffdf9; overflow:hidden; }'
 
-    + '.body { padding:28px 40px 0; }'
-    + '.rsvp-header { display:flex; align-items:center; gap:14px; margin-bottom:22px; }'
+    // Photo with cream fade
+    + '.hero { position:relative; }'
+    + '.hero img { display:block; width:100%; height:auto; }'
+    + '.hero-overlay { position:absolute; bottom:0; left:0; right:0; height:60%; background:linear-gradient(to bottom, transparent 0%, #fffdf9 100%); }'
+    + '.hero-text { position:absolute; bottom:0; left:0; right:0; text-align:center; padding:0 32px 24px; z-index:2; }'
+
+    // No photo fallback
+    + '.header-plain { text-align:center; padding:48px 32px 24px; }'
+
+    // Shared header styles
+    + '.h-sub { font-family:"Manrope",Arial,sans-serif; font-size:10px; letter-spacing:0.35em; text-transform:uppercase; color:#8c857c; margin-bottom:8px; }'
+    + '.h-names { font-family:"Cormorant Garamond","Georgia",serif; font-size:44px; font-weight:300; color:#3a3530; line-height:1.15; }'
+    + '.h-names .amp { font-style:italic; color:#b8895a; font-size:36px; margin:0 3px; }'
+    + '.h-tagline { font-family:"Cormorant Garamond","Georgia",serif; font-style:italic; font-size:15px; color:#8c857c; font-weight:300; margin-top:12px; line-height:1.5; }'
+    + '.h-line { width:40px; height:1.5px; background:#d4b88f; margin:14px auto 0; }'
+
+    // Body
+    + '.body { padding:24px 40px 0; }'
+
+    // RSVP header with lines
+    + '.rsvp-header { display:flex; align-items:center; gap:14px; margin-bottom:20px; }'
     + '.rh-line { flex:1; height:1px; background:#e0d9cf; }'
-    + '.rh-text { font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#b8895a; font-weight:500; white-space:nowrap; }'
+    + '.rh-text { font-family:"Manrope",Arial,sans-serif; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#b8895a; font-weight:500; white-space:nowrap; }'
+
+    // Response rows
     + '.row { display:flex; align-items:baseline; gap:10px; padding:12px 0; }'
     + '.row + .row { border-top:1px solid #f0ebe1; }'
-    + '.guest-name { font-family:"Cormorant Garamond",serif; font-size:22px; font-weight:400; color:#3a3530; white-space:nowrap; }'
-    + '.dietary { font-family:"Cormorant Garamond",serif; font-size:14px; color:#8c857c; white-space:nowrap; }'
+    + '.guest-name { font-family:"Cormorant Garamond","Georgia",serif; font-size:22px; font-weight:400; color:#3a3530; white-space:nowrap; }'
+    + '.dietary { font-family:"Cormorant Garamond","Georgia",serif; font-size:14px; color:#8c857c; white-space:nowrap; }'
     + '.row-line { flex:1; border-bottom:1px solid #e8e2d8; margin-bottom:4px; min-width:20px; }'
-    + '.badge { font-size:8px; letter-spacing:0.14em; text-transform:uppercase; padding:5px 14px; border:1px solid; white-space:nowrap; font-weight:400; }'
+    + '.badge { font-family:"Manrope",Arial,sans-serif; font-size:8px; letter-spacing:0.14em; text-transform:uppercase; padding:5px 14px; border:1px solid; white-space:nowrap; font-weight:400; }'
     + '.badge.accept { color:#b8895a; border-color:#c9a76e; }'
     + '.badge.decline { color:#8c857c; border-color:#aaa; }'
-    + '.event-section { border-top:1px solid #e0d9cf; margin-top:20px; padding-top:22px; text-align:center; }'
-    + '.event-datetime { font-family:"Cormorant Garamond",serif; font-size:26px; font-weight:400; color:#3a3530; }'
-    + '.event-datetime .dot { margin:0 6px; color:#c9a76e; }'
-    + '.event-venue { font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#3a3530; font-weight:600; margin-top:6px; }'
-    + '.footer-section { border-top:1px solid #e0d9cf; margin-top:22px; padding-top:20px; text-align:center; }'
-    + '.change-note { font-size:11px; color:#8c857c; line-height:1.6; font-weight:300; }'
+
+    // Event
+    + '.event-section { border-top:1px solid #e0d9cf; margin-top:18px; padding-top:20px; text-align:center; }'
+    + '.event-datetime { font-family:"Cormorant Garamond","Georgia",serif; font-size:24px; font-weight:400; color:#3a3530; }'
+    + '.event-datetime .dot { margin:0 4px; color:#c9a76e; }'
+    + '.event-venue { font-family:"Manrope",Arial,sans-serif; font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#3a3530; font-weight:600; margin-top:6px; }'
+
+    // Footer
+    + '.footer-section { border-top:1px solid #e0d9cf; margin-top:20px; padding:20px 0 36px; text-align:center; }'
+    + '.change-note { font-family:"Manrope",Arial,sans-serif; font-size:11px; color:#8c857c; line-height:1.6; font-weight:300; }'
     + '.change-note strong { font-weight:600; color:#3a3530; }'
-    + '.site-link { display:inline-block; margin-top:10px; font-size:9px; letter-spacing:0.14em; color:#b8895a; text-decoration:none; font-weight:500; border-bottom:1px solid #d4b88f; padding-bottom:2px; }'
-    + '.bottom-pad { height:50px; }'
+    + '.site-link { display:inline-block; margin-top:10px; font-family:"Manrope",Arial,sans-serif; font-size:9px; letter-spacing:0.14em; color:#b8895a; text-decoration:none; font-weight:500; border-bottom:1px solid #d4b88f; padding-bottom:2px; }'
 
-    + '.save-bar { position:fixed; bottom:0; left:0; right:0; background:#3a3530; padding:14px; text-align:center; z-index:10; }'
-    + '.save-btn { font-family:"Manrope",sans-serif; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; padding:12px 36px; background:#b8895a; color:#fff; border:none; cursor:pointer; }'
-    + '.save-btn:hover { background:#a07848; }'
+    // Save bar
+    + '.save-bar { text-align:center; padding:20px; background:#f7f4ef; }'
+    + '.save-btn { font-family:"Manrope",Arial,sans-serif; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; padding:14px 40px; background:#3a3530; color:#fff; border:none; cursor:pointer; }'
+    + '.save-btn:hover { background:#b8895a; }'
+
     + '</style></head><body>'
+    + '<div class="card">';
 
-    + '<div class="card ' + (photoUrl ? '' : 'no-photo') + '">'
+  // Hero section — photo with text overlay, or plain header
+  if (hasPhoto) {
+    html += '<div class="hero">'
+      + '<img src="' + photoUrl + '" alt="">'
+      + '<div class="hero-overlay"></div>'
+      + '<div class="hero-text">'
+      + '<p class="h-sub">The Wedding of</p>'
+      + '<p class="h-names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
+      + '<div class="h-line"></div>'
+      + '<p class="h-tagline">Thank you for celebrating with us, your presence means the world.</p>'
+      + '</div></div>';
+  } else {
+    html += '<div class="header-plain">'
+      + '<p class="h-sub">The Wedding of</p>'
+      + '<p class="h-names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
+      + '<div class="h-line"></div>'
+      + '<p class="h-tagline">Thank you for celebrating with us, your presence means the world.</p>'
+      + '</div>';
+  }
 
-    + '<div class="hero">'
-    + photoHtml
-    + '<div class="hero-fade"></div>'
-    + '<div class="hero-content">'
-    + '<p class="h-sub">The Wedding of</p>'
-    + '<p class="h-names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
-    + '<div class="h-line"></div>'
-    + '<p class="h-tagline">Thank you for celebrating with us, your presence means the world.</p>'
-    + '</div></div>'
-
-    + '<div class="fallback-header">'
-    + '<p class="h-sub">The Wedding of</p>'
-    + '<p class="h-names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
-    + '<div class="h-line"></div>'
-    + '<p class="h-tagline">Thank you for celebrating with us, your presence means the world.</p>'
-    + '</div>'
-
-    + '<div class="body">'
+  html += '<div class="body">'
     + '<div class="rsvp-header"><span class="rh-line"></span><span class="rh-text">RSVP Confirmation</span><span class="rh-line"></span></div>'
     + rowsHtml
     + '<div class="event-section">'
@@ -1398,11 +1410,8 @@ function downloadConfirmation() {
     + '<p class="change-note">To make changes, re-enter your name on the website before <strong>' + d.deadline + '</strong>.</p>'
     + '<a class="site-link" href="' + d.websiteUrl + '">' + siteLabel + '</a>'
     + '</div>'
-    + '<div class="bottom-pad"></div>'
     + '</div></div>'
-
     + '<div class="save-bar"><button class="save-btn" onclick="window.print()">Save as PDF</button></div>'
-
     + '</body></html>';
 
   var w = window.open('', '_blank');
