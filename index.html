@@ -1443,6 +1443,7 @@ async function downloadConfirmation() {
         + '<a class="back-link" href="' + d.websiteUrl + '">Return to Wedding Website</a>'
         + '</body></html>');
       document.close();
+      document.title = 'steph&jeff wedding_rsvp confirmation';
       return;
 
     } catch(err) {
@@ -1480,6 +1481,7 @@ async function downloadConfirmation() {
   if (w) {
     w.document.write(html);
     w.document.close();
+    w.document.title = 'steph&jeff wedding_rsvp confirmation';
   } else {
     alert('Pop-up was blocked. Please allow pop-ups for this site and try again.');
   }
