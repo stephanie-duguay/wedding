@@ -1313,7 +1313,7 @@ function downloadConfirmation() {
   var siteLabel = d.websiteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '').toUpperCase().replace(/\//g, ' / ');
 
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">'
-    + '<title>hodgins wedding_rsvp confirmation</title>'
+    + '<title>RSVP Confirmation</title>'
     + '<style>'
     + '@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap");'
     + '*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }'
@@ -1323,9 +1323,12 @@ function downloadConfirmation() {
 
     + '.card { width:384px; background:#fffdf9; box-shadow:0 1px 6px rgba(0,0,0,0.08); }'
 
-    + '.photo { width:100%; height:180px; object-fit:cover; object-position:center 20%; display:block; }'
+    + '.photo-wrap { position:relative; width:100%; height:210px; overflow:hidden; }'
+    + '.photo { width:100%; height:100%; object-fit:cover; object-position:center 20%; display:block; }'
+    + '.photo-overlay { position:absolute; bottom:0; left:0; right:0; text-align:center; padding:0 24px 14px; z-index:2; }'
+    + '.photo-fade { position:absolute; bottom:0; left:0; right:0; height:65%; background:linear-gradient(to bottom, transparent, rgba(255,253,249,0.85) 70%, #fffdf9 100%); }'
 
-    + '.header { text-align:center; padding:14px 24px 12px; }'
+    + '.header { text-align:center; padding:10px 24px 12px; }'
     + '.h-sub { font-family:"Manrope",Arial,sans-serif; font-size:7px; letter-spacing:0.3em; text-transform:uppercase; color:#8c857c; margin-bottom:4px; }'
     + '.h-names { font-family:"Cormorant Garamond","Georgia",serif; font-size:28px; font-weight:300; color:#3a3530; line-height:1.15; }'
     + '.h-names .amp { font-style:italic; color:#b8895a; font-size:23px; margin:0 2px; }'
@@ -1339,7 +1342,7 @@ function downloadConfirmation() {
     + '.rh-text { font-family:"Manrope",Arial,sans-serif; font-size:7px; letter-spacing:0.2em; text-transform:uppercase; color:#b8895a; font-weight:500; white-space:nowrap; }'
 
     + '.row { display:flex; align-items:baseline; gap:6px; padding:7px 0; }'
-    + '.row + .row { border-top:1px solid #f0ebe1; }'
+    + '.row + .row { }'
     + '.guest-name { font-family:"Cormorant Garamond","Georgia",serif; font-size:15px; font-weight:400; color:#3a3530; white-space:nowrap; }'
     + '.dietary { font-family:"Cormorant Garamond","Georgia",serif; font-size:9.5px; color:#8c857c; white-space:nowrap; }'
     + '.row-line { flex:1; border-bottom:1px solid #e8e2d8; margin-bottom:2px; min-width:12px; }'
@@ -1365,15 +1368,25 @@ function downloadConfirmation() {
     + '<div class="card">';
 
   if (photoUrl) {
-    html += '<img class="photo" src="' + photoUrl + '" alt="">';
+    html += '<div class="photo-wrap">'
+      + '<img class="photo" src="' + photoUrl + '" alt="">'
+      + '<div class="photo-fade"></div>'
+      + '<div class="photo-overlay">'
+      + '<p class="h-sub">The Wedding of</p>'
+      + '<p class="h-names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
+      + '</div></div>';
+    html += '<div class="header">'
+      + '<div class="h-line"></div>'
+      + '<p class="h-tagline">Thank you for celebrating with us, your presence means the world.</p>'
+      + '</div>';
+  } else {
+    html += '<div class="header">'
+      + '<p class="h-sub">The Wedding of</p>'
+      + '<p class="h-names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
+      + '<div class="h-line"></div>'
+      + '<p class="h-tagline">Thank you for celebrating with us, your presence means the world.</p>'
+      + '</div>';
   }
-
-  html += '<div class="header">'
-    + '<p class="h-sub">The Wedding of</p>'
-    + '<p class="h-names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
-    + '<div class="h-line"></div>'
-    + '<p class="h-tagline">Thank you for celebrating with us, your presence means the world.</p>'
-    + '</div>'
 
     + '<div class="body">'
     + '<div class="rsvp-header"><span class="rh-line"></span><span class="rh-text">RSVP Confirmation</span><span class="rh-line"></span></div>'
