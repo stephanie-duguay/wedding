@@ -718,7 +718,7 @@ const CONFIG = {
   hotels: [
     {
       name: "Brookstreet Hotel",
-      description: "We've reserved a room block at the Brookstreet Hotel for our wedding guests. It's a beautiful hotel in Kanata that makes a great home base for the weekend, with easy access to Ottawa and a comfortable drive to the venue.",
+      description: "We've reserved a room block at the Brookstreet Hotel for our wedding guests. It's a beautiful hotel that makes a great home base for the weekend, with easy access to Ottawa and a comfortable drive to the venue.",
       address: "525 Legget Dr, Ottawa, ON K2K 2W2",
       mapsUrl: "https://www.google.com/maps/search/?api=1&query=Brookstreet+Hotel+525+Legget+Dr+Ottawa+ON",
       bookingUrl: "https://bookings.travelclick.com/13193?groupID=5125649",
@@ -750,7 +750,7 @@ const CONFIG = {
     { q: "How do I get to the venue?", a: "The venue is about 45 minutes southwest of downtown Ottawa. We are not providing a shuttle service, so please plan your transportation accordingly. We recommend carpooling with friends or family, or arranging a rideshare if you'd prefer not to drive. The Brookstreet Hotel (where our room block is) is about 30 minutes from the venue." },
     { q: "What should I wear on my feet?", a: "The ceremony and parts of the reception are on grass and gravel, so stilettos are not your friend here! We recommend wedges, flats, block heels, or dressy sandals. Comfort is key — there will be dancing!" },
     { q: "Do you have a registry?", a: "No registry! Your presence at our wedding is the greatest gift. We kindly ask for no boxed gifts, a card table will be set up at the reception for any monetary gifts, which will go toward our honeymoon and starting our life together." },
-    { q: "Who should I contact before the wedding?", a: "For any questions in the lead-up to the big day — RSVPs, travel, accommodations, or anything else — please reach out to Stephanie directly at <a href='mailto:stephanie.duguay@gmail.com' style='color:#b8895a'>stephanie.duguay@gmail.com</a> or <a href='tel:6138675309' style='color:#b8895a'>613-867-5309</a>. We're happy to help!" },
+    { q: "Who should I contact before the wedding?", a: "For any questions in the lead-up to the big day, RSVPs, travel, accommodations, or anything else, please reach out to Claudia directly on her cell <a href='tel:6133623909' style='color:#b8895a'>613-362-3909</a>." },
     { q: "Who should I contact the day of the wedding?", a: "If you need anything on the wedding day, please reach out to our day-of coordinator, Shannon Hodgins, on her cell: <a href='tel:6138826563' style='color:#b8895a'>613-882-6563</a>. Please avoid calling us directly — we'll be a little busy! 😊" },
     // ➕ Add more FAQs here
   ],
@@ -1280,7 +1280,7 @@ function initSiteLogic() {
     const contactLink = CONFIG.contactEmail
       ? `<a href="mailto:${CONFIG.contactEmail}">send us a message</a>`
       : "send us a message";
-    actionsHtml += `<p class="ty-update-note">Need to update your RSVP? Just revisit this page and re-enter your last name, or ${contactLink}.</p>`;
+    actionsHtml += `<p class="ty-update-note">Need to update your RSVP? Just revisit this page and re-enter your name, or ${contactLink}.</p>`;
     actionsEl.innerHTML = actionsHtml;
   });
 
@@ -1306,7 +1306,7 @@ async function downloadConfirmation() {
 
   // Build response rows
   var rowsHtml = '';
-  d.responses.forEach(function(r, i) {
+  d.responses.forEach(function(r) {
     var badge = r.attending
       ? '<span class="badge accept">Accepts</span>'
       : '<span class="badge decline">Declines</span>';
@@ -1315,38 +1315,29 @@ async function downloadConfirmation() {
   });
 
   var photoUrl = CONFIG.confirmationImageUrl || CONFIG.heroImageUrl || '';
-  var photoStyle = photoUrl
-    ? 'background-image:url(' + photoUrl + ');background-size:cover;background-position:center 20%;'
-    : 'background:#3a3530;';
+  var photoHtml = photoUrl
+    ? '<img class="hero-img" src="' + photoUrl + '" crossorigin="anonymous">'
+    : '';
 
   var siteLabel = d.websiteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '').toUpperCase().replace(/\//g, ' / ');
 
-  var html = '<div class="conf-card">'
+  var cardHtml = '<div class="conf-card">'
     + '<style>'
-    + '@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap");'
     + '.conf-card * { box-sizing:border-box; margin:0; padding:0; }'
     + '.conf-card { width:520px; font-family:"Manrope",sans-serif; background:#fffdf9; }'
-
-    // Hero with text overlay
-    + '.hero { position:relative; width:100%; height:480px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; text-align:center; padding:0 40px 40px; color:#fff; }'
-    + '.hero-bg { position:absolute; inset:0; ' + photoStyle + ' }'
-    + '.hero-fade { position:absolute; inset:0; background:linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.45) 100%); }'
-    + '.hero * { position:relative; z-index:1; }'
-    + '.hero .h-sub { font-size:10px; letter-spacing:0.35em; text-transform:uppercase; margin-bottom:10px; font-weight:400; opacity:0.9; }'
-    + '.hero .h-names { font-family:"Cormorant Garamond",serif; font-size:52px; font-weight:300; line-height:1.1; }'
-    + '.hero .h-names .amp { font-style:italic; color:#d4b88f; font-size:44px; margin:0 2px; }'
-    + '.hero .h-line { width:36px; height:1.5px; background:rgba(255,255,255,0.5); margin:16px auto; }'
-    + '.hero .h-tagline { font-family:"Cormorant Garamond",serif; font-style:italic; font-size:17px; font-weight:300; opacity:0.92; line-height:1.5; }'
-
-    // Body
-    + '.body { padding:28px 40px 40px; }'
-
-    // RSVP label with side lines
-    + '.rsvp-header { display:flex; align-items:center; gap:14px; margin-bottom:24px; }'
-    + '.rsvp-header .rh-line { flex:1; height:1px; background:#e0d9cf; }'
-    + '.rsvp-header .rh-text { font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#b8895a; font-weight:500; white-space:nowrap; }'
-
-    // Response rows
+    + '.hero { position:relative; width:520px; height:480px; overflow:hidden; }'
+    + '.hero-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; object-position:center 20%; }'
+    + '.hero-fade { position:absolute; bottom:0; left:0; right:0; height:260px; background:linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 100%); }'
+    + '.hero-content { position:absolute; bottom:36px; left:0; right:0; text-align:center; color:#fff; z-index:2; padding:0 36px; }'
+    + '.h-sub { font-size:10px; letter-spacing:0.35em; text-transform:uppercase; margin-bottom:10px; font-weight:400; opacity:0.9; }'
+    + '.h-names { font-family:"Cormorant Garamond",serif; font-size:52px; font-weight:300; line-height:1.1; }'
+    + '.h-names .amp { font-style:italic; color:#d4b88f; font-size:44px; margin:0 2px; }'
+    + '.h-line { width:36px; height:1.5px; background:rgba(255,255,255,0.5); margin:16px auto; }'
+    + '.h-tagline { font-family:"Cormorant Garamond",serif; font-style:italic; font-size:17px; font-weight:300; opacity:0.92; line-height:1.5; }'
+    + '.body { padding:28px 44px 0; }'
+    + '.rsvp-header { display:flex; align-items:center; gap:14px; margin-bottom:22px; }'
+    + '.rh-line { flex:1; height:1px; background:#e0d9cf; }'
+    + '.rh-text { font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#b8895a; font-weight:500; white-space:nowrap; }'
     + '.row { display:flex; align-items:baseline; gap:10px; padding:12px 0; }'
     + '.row + .row { border-top:1px solid #f0ebe1; }'
     + '.guest-name { font-family:"Cormorant Garamond",serif; font-size:22px; font-weight:400; color:#3a3530; white-space:nowrap; }'
@@ -1355,70 +1346,65 @@ async function downloadConfirmation() {
     + '.badge { font-size:8px; letter-spacing:0.14em; text-transform:uppercase; padding:5px 14px; border:1px solid; white-space:nowrap; font-weight:400; }'
     + '.badge.accept { color:#b8895a; border-color:#c9a76e; }'
     + '.badge.decline { color:#8c857c; border-color:#aaa; }'
-
-    // Event section
     + '.event-section { border-top:1px solid #e0d9cf; margin-top:20px; padding-top:22px; text-align:center; }'
     + '.event-datetime { font-family:"Cormorant Garamond",serif; font-size:26px; font-weight:400; color:#3a3530; }'
     + '.event-datetime .dot { margin:0 6px; color:#c9a76e; }'
     + '.event-venue { font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#3a3530; font-weight:600; margin-top:6px; }'
-
-    // Footer
     + '.footer-section { border-top:1px solid #e0d9cf; margin-top:22px; padding-top:20px; text-align:center; }'
     + '.change-note { font-size:11px; color:#8c857c; line-height:1.6; font-weight:300; }'
     + '.change-note strong { font-weight:600; color:#3a3530; }'
-    + '.site-link { display:inline-block; margin-top:10px; font-size:9px; letter-spacing:0.14em; color:#b8895a; text-decoration:none; border-bottom:1px solid #d4b88f; padding-bottom:2px; font-weight:500; }'
-
-    // Bottom pad
+    + '.site-link { display:inline-block; margin-top:10px; font-size:9px; letter-spacing:0.14em; color:#b8895a; font-weight:500; border-bottom:1px solid #d4b88f; padding-bottom:2px; }'
     + '.bottom-pad { height:50px; }'
     + '</style>'
 
-    + '<div class="hero"><div class="hero-bg"></div><div class="hero-fade"></div>'
+    + '<div class="hero">'
+    + photoHtml
+    + '<div class="hero-fade"></div>'
+    + '<div class="hero-content">'
     + '<p class="h-sub">The Wedding of</p>'
     + '<p class="h-names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
     + '<div class="h-line"></div>'
     + '<p class="h-tagline">Thank you for celebrating with us, your presence means the world.</p>'
-    + '</div>'
+    + '</div></div>'
 
     + '<div class="body">'
-
     + '<div class="rsvp-header"><span class="rh-line"></span><span class="rh-text">RSVP Confirmation</span><span class="rh-line"></span></div>'
     + rowsHtml
-
     + '<div class="event-section">'
     + '<p class="event-datetime">' + d.date + '<span class="dot">&middot;</span>' + d.time + '</p>'
     + '<p class="event-venue">' + d.venue + '</p>'
     + '</div>'
-
     + '<div class="footer-section">'
     + '<p class="change-note">To make changes, re-enter your name on the website before <strong>' + d.deadline + '</strong>.</p>'
     + '<span class="site-link">' + siteLabel + '</span>'
     + '</div>'
-
     + '<div class="bottom-pad"></div>'
     + '</div></div>';
 
   // Create off-screen container
   var container = document.createElement('div');
   container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;';
-  container.innerHTML = html;
+  container.innerHTML = cardHtml;
   document.body.appendChild(container);
 
   try {
-    await document.fonts.ready;
-    // Wait for background image to load
-    if (photoUrl) {
+    // Wait for the photo to load
+    var heroImg = container.querySelector('.hero-img');
+    if (heroImg && !heroImg.complete) {
       await new Promise(function(resolve) {
-        var img = new Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = resolve;
-        img.onerror = resolve;
-        setTimeout(resolve, 3000);
-        img.src = photoUrl;
+        heroImg.onload = resolve;
+        heroImg.onerror = resolve;
+        setTimeout(resolve, 4000);
       });
     }
-    await new Promise(function(r) { setTimeout(r, 600); });
 
-    // Load html2canvas dynamically
+    // Wait for fonts
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+    await new Promise(function(r) { setTimeout(r, 500); });
+
+    // Load html2canvas
     if (!window.html2canvas) {
       await new Promise(function(resolve, reject) {
         var s = document.createElement('script');
@@ -1440,19 +1426,30 @@ async function downloadConfirmation() {
       scale: 2,
       useCORS: true,
       backgroundColor: '#fffdf9',
-      logging: false
+      logging: false,
+      allowTaint: false
     });
 
-    var link = document.createElement('a');
-    link.download = 'rsvp-confirmation.png';
-    link.href = canvas.toDataURL('image/png');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Trigger download
+    canvas.toBlob(function(blob) {
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'rsvp-confirmation.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 'image/png');
 
   } catch (err) {
     console.error('Confirmation generation failed:', err);
-    alert('Something went wrong. Please try again.');
+    // Fallback: open as viewable page
+    var w = window.open('', '_blank');
+    if (w) {
+      w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet"></head><body style="margin:0;background:#f7f4ef;display:flex;justify-content:center;padding:20px">' + cardHtml + '</body></html>');
+      w.document.close();
+    }
   } finally {
     document.body.removeChild(container);
     if (btn) { btn.disabled = false; btn.textContent = 'Save Confirmation'; }
