@@ -1318,21 +1318,14 @@ async function downloadConfirmation() {
   var photoDataUrl = '';
   if (photoUrl) {
     try {
-      var img = new Image();
-      img.crossOrigin = 'anonymous';
-      await new Promise(function(resolve) {
-        img.onload = resolve;
-        img.onerror = resolve;
-        setTimeout(resolve, 4000);
-        img.src = photoUrl;
+      var response = await fetch(photoUrl);
+      var blob = await response.blob();
+      photoDataUrl = await new Promise(function(resolve) {
+        var reader = new FileReader();
+        reader.onloadend = function() { resolve(reader.result); };
+        reader.onerror = function() { resolve(''); };
+        reader.readAsDataURL(blob);
       });
-      if (img.naturalWidth > 0) {
-        var canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        canvas.getContext('2d').drawImage(img, 0, 0);
-        photoDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-      }
     } catch(e) { photoDataUrl = ''; }
   }
 
