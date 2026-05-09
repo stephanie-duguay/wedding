@@ -1303,6 +1303,7 @@ async function downloadConfirmation() {
   if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
 
   var d = window._confirmationData;
+  var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   var rowsHtml = '';
   d.responses.forEach(function(r) {
@@ -1313,38 +1314,14 @@ async function downloadConfirmation() {
     rowsHtml += '<div class="row"><span class="guest-name">' + r.name + '</span>' + dietary + '<span class="row-line"></span>' + badge + '</div>';
   });
 
-  // Convert photo to base64 so it survives mobile Safari print
   var photoUrl = CONFIG.confirmationImageUrl || CONFIG.heroImageUrl || '';
-  var photoDataUrl = '';
-  if (photoUrl) {
-    try {
-      var response = await fetch(photoUrl);
-      var blob = await response.blob();
-      photoDataUrl = await new Promise(function(resolve) {
-        var reader = new FileReader();
-        reader.onloadend = function() { resolve(reader.result); };
-        reader.onerror = function() { resolve(''); };
-        reader.readAsDataURL(blob);
-      });
-    } catch(e) { photoDataUrl = ''; }
-  }
-
-  if (btn) { btn.textContent = 'Opening…'; }
-
   var siteLabel = d.websiteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '').toUpperCase().replace(/\//g, ' / ');
 
-  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-    + '<title>hodgins wedding_rsvp confirmation</title>'
-    + '<style>'
+  // Shared card styles
+  var cardStyles = ''
     + '@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap");'
-    + '*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }'
-    + 'body { background:#e8e3db; font-family:"Manrope",Arial,sans-serif; -webkit-print-color-adjust:exact; print-color-adjust:exact; margin:0; padding:0; }'
-    + '@page { margin:0; size:6in 9in; }'
-    + '@media print { body { background:#fff; } .save-bar { display:none !important; } .card { max-width:100%; } }'
-    + '@media (max-width:500px) { .hero-img { aspect-ratio:3/2 !important; } .h-names { font-size:28px !important; } .h-names .amp { font-size:22px !important; } .h-tagline { font-size:11px !important; } .h-sub { font-size:8px !important; } .h-line { margin:8px auto !important; } .hero-content { bottom:12px !important; padding:0 16px !important; } .guest-name { font-size:16px !important; } .dietary { font-size:10px !important; } .badge { font-size:6px !important; min-width:70px !important; } .event-datetime { font-size:18px !important; } .event-venue { font-size:8px !important; } .rh-text { font-size:8px !important; } .change-note { font-size:9px !important; } .site-link { font-size:7px !important; } .body { padding:12px 18px 0 !important; } .row { padding:6px 0 !important; } .footer-section { padding:10px 0 16px !important; margin-top:8px !important; } .event-section { margin-top:8px !important; padding-top:10px !important; } .rsvp-header { margin-bottom:10px !important; } }'
-
-    + '.card { width:100%; max-width:600px; margin:0 auto; background:#fffdf9; }'
-
+    + '.conf-card * { box-sizing:border-box; margin:0; padding:0; }'
+    + '.conf-card { width:520px; font-family:"Manrope",Arial,sans-serif; background:#fffdf9; }'
     + '.hero { position:relative; width:100%; overflow:hidden; }'
     + '.hero-img { display:block; width:100%; aspect-ratio:4/3; object-fit:cover; object-position:center 20%; }'
     + '.hero-gradient { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,0) 20%, rgba(0,0,0,0.55) 100%); }'
@@ -1354,20 +1331,16 @@ async function downloadConfirmation() {
     + '.h-names .amp { font-style:italic; color:#d4b88f; font-size:35px; margin:0 3px; }'
     + '.h-line { width:30px; height:1px; background:rgba(255,255,255,0.5); margin:12px auto; }'
     + '.h-tagline { font-family:"Cormorant Garamond","Georgia",serif; font-style:italic; font-size:15px; font-weight:300; opacity:0.92; line-height:1.5; }'
-
     + '.header-plain { text-align:center; padding:32px 28px 20px; }'
     + '.header-plain .h-sub { color:#8c857c; }'
     + '.header-plain .h-names { color:#3a3530; }'
     + '.header-plain .h-names .amp { color:#b8895a; }'
     + '.header-plain .h-line { background:#d4b88f; }'
     + '.header-plain .h-tagline { color:#8c857c; }'
-
     + '.body { padding:16px 28px 0; }'
-
     + '.rsvp-header { display:flex; align-items:center; gap:12px; margin-bottom:14px; }'
     + '.rh-line { flex:1; height:1px; background:#e0d9cf; }'
     + '.rh-text { font-family:"Manrope",Arial,sans-serif; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:#b8895a; font-weight:500; white-space:nowrap; }'
-
     + '.row { display:flex; align-items:baseline; gap:7px; padding:8px 0; }'
     + '.guest-name { font-family:"Cormorant Garamond","Georgia",serif; font-size:20px; font-weight:400; color:#3a3530; white-space:nowrap; }'
     + '.dietary { font-family:"Cormorant Garamond","Georgia",serif; font-size:13px; color:#8c857c; white-space:nowrap; }'
@@ -1375,44 +1348,31 @@ async function downloadConfirmation() {
     + '.badge { font-family:"Manrope",Arial,sans-serif; font-size:8px; letter-spacing:0.12em; text-transform:uppercase; padding:4px 12px; border:1px solid; white-space:nowrap; min-width:90px; text-align:center; display:inline-block; }'
     + '.badge.accept { color:#b8895a; border-color:#c9a76e; }'
     + '.badge.decline { color:#8c857c; border-color:#aaa; }'
-
     + '.event-section { border-top:1px solid #e0d9cf; margin-top:12px; padding-top:14px; text-align:center; }'
     + '.event-datetime { font-family:"Cormorant Garamond","Georgia",serif; font-size:24px; font-weight:400; color:#3a3530; }'
     + '.event-datetime .dot { margin:0 3px; color:#c9a76e; }'
     + '.event-venue { font-family:"Manrope",Arial,sans-serif; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:#3a3530; font-weight:600; margin-top:4px; }'
-
     + '.footer-section { border-top:1px solid #e0d9cf; margin-top:12px; padding:12px 0 24px; text-align:center; }'
     + '.change-note { font-family:"Manrope",Arial,sans-serif; font-size:11px; color:#8c857c; line-height:1.6; font-weight:300; }'
     + '.change-note strong { font-weight:600; color:#3a3530; }'
-    + '.site-link { display:inline-block; margin-top:7px; font-family:"Manrope",Arial,sans-serif; font-size:9px; letter-spacing:0.12em; color:#b8895a; text-decoration:none; font-weight:500; border-bottom:1px solid #d4b88f; padding-bottom:1px; }'
+    + '.site-link { display:inline-block; margin-top:7px; font-family:"Manrope",Arial,sans-serif; font-size:9px; letter-spacing:0.12em; color:#b8895a; text-decoration:none; font-weight:500; border-bottom:1px solid #d4b88f; padding-bottom:1px; }';
 
-    + '.save-bar { text-align:center; padding:16px; background:#3a3530; }'
-    + '.save-btn { font-family:"Manrope",Arial,sans-serif; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; padding:10px 32px; background:#b8895a; color:#fff; border:none; cursor:pointer; }'
-    + '.save-btn:hover { background:#a07848; }'
-
-    + '</style></head><body>'
-    + '<div class="card">';
-
-  if (photoDataUrl) {
-    html += '<div class="hero">'
-      + '<img class="hero-img" src="' + photoDataUrl + '" alt="">'
-      + '<div class="hero-gradient"></div>'
-      + '<div class="hero-content">'
+  // Shared card HTML (no wrapper page, just the card content)
+  var heroHtml = photoUrl
+    ? '<div class="hero"><img class="hero-img" src="' + photoUrl + '" crossorigin="anonymous"><div class="hero-gradient"></div><div class="hero-content">'
       + '<p class="h-sub">The Wedding of</p>'
       + '<p class="h-names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
       + '<div class="h-line"></div>'
       + '<p class="h-tagline">Thank you for your response! We can&rsquo;t wait to celebrate together.</p>'
-      + '</div></div>';
-  } else {
-    html += '<div class="header-plain">'
+      + '</div></div>'
+    : '<div class="header-plain">'
       + '<p class="h-sub">The Wedding of</p>'
       + '<p class="h-names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
       + '<div class="h-line"></div>'
       + '<p class="h-tagline">Thank you for your response! We can&rsquo;t wait to celebrate together.</p>'
       + '</div>';
-  }
 
-  html += '<div class="body">'
+  var bodyHtml = '<div class="body">'
     + '<div class="rsvp-header"><span class="rh-line"></span><span class="rh-text">RSVP Confirmation</span><span class="rh-line"></span></div>'
     + rowsHtml
     + '<div class="event-section">'
@@ -1423,7 +1383,88 @@ async function downloadConfirmation() {
     + '<p class="change-note">To make changes, re-enter your name on the website before <strong>' + d.deadline + '</strong>.</p>'
     + '<a class="site-link" href="' + d.websiteUrl + '">' + siteLabel + '</a>'
     + '</div>'
-    + '</div></div>'
+    + '</div>';
+
+  // ═══════════════════════════════════════
+  // MOBILE: render as image via html2canvas
+  // ═══════════════════════════════════════
+  if (isMobile) {
+    if (btn) { btn.textContent = 'Generating image…'; }
+
+    var container = document.createElement('div');
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;';
+    container.innerHTML = '<div class="conf-card"><style>' + cardStyles + '</style>' + heroHtml + bodyHtml + '</div>';
+    document.body.appendChild(container);
+
+    try {
+      // Wait for image to load
+      var heroImg = container.querySelector('.hero-img');
+      if (heroImg && !heroImg.complete) {
+        await new Promise(function(resolve) {
+          heroImg.onload = resolve;
+          heroImg.onerror = resolve;
+          setTimeout(resolve, 4000);
+        });
+      }
+      // Wait for fonts
+      if (document.fonts && document.fonts.ready) await document.fonts.ready;
+      await new Promise(function(r) { setTimeout(r, 600); });
+
+      // Load html2canvas
+      if (!window.html2canvas) {
+        await new Promise(function(resolve, reject) {
+          var s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+          s.onload = resolve;
+          s.onerror = function() {
+            var s2 = document.createElement('script');
+            s2.src = 'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js';
+            s2.onload = resolve;
+            s2.onerror = reject;
+            document.head.appendChild(s2);
+          };
+          document.head.appendChild(s);
+        });
+      }
+
+      var card = container.querySelector('.conf-card');
+      var canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fffdf9', logging: false });
+
+      // Download as PNG
+      var link = document.createElement('a');
+      link.download = 'rsvp-confirmation.png';
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch(err) {
+      console.error('Image generation failed:', err);
+      alert('Could not generate image. Please take a screenshot instead.');
+    } finally {
+      document.body.removeChild(container);
+      if (btn) { btn.disabled = false; btn.textContent = 'Save Confirmation'; }
+    }
+    return;
+  }
+
+  // ═══════════════════════════════════════
+  // DESKTOP: open styled page with print
+  // ═══════════════════════════════════════
+  if (btn) { btn.textContent = 'Opening…'; }
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<title>RSVP Confirmation</title>'
+    + '<style>'
+    + cardStyles
+    + 'body { background:#e8e3db; -webkit-print-color-adjust:exact; print-color-adjust:exact; margin:0; padding:0; }'
+    + '@page { margin:0; size:6in 9in; }'
+    + '@media print { body { background:#fff; } .save-bar { display:none !important; } .conf-card { max-width:100%; } }'
+    + '.conf-card { margin:0 auto; }'
+    + '.save-bar { text-align:center; padding:16px; background:#3a3530; }'
+    + '.save-btn { font-family:"Manrope",Arial,sans-serif; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; padding:10px 32px; background:#b8895a; color:#fff; border:none; cursor:pointer; }'
+    + '.save-btn:hover { background:#a07848; }'
+    + '</style></head><body>'
+    + '<div class="conf-card">' + heroHtml + bodyHtml + '</div>'
     + '<div class="save-bar"><button class="save-btn" onclick="window.print()">Save as PDF</button></div>'
     + '</body></html>';
 
