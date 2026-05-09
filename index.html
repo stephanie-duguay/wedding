@@ -1276,7 +1276,7 @@ function initSiteLogic() {
     };
 
     const actionsEl = document.getElementById("ty-actions");
-    let actionsHtml = `<button class="ty-email-btn" onclick="downloadConfirmation()" style="cursor:pointer">Download Confirmation</button>`;
+    let actionsHtml = `<button class="ty-email-btn" onclick="downloadConfirmation()" style="cursor:pointer">View Confirmation</button>`;
     const contactLink = CONFIG.contactEmail
       ? `<a href="mailto:${CONFIG.contactEmail}">send us a message</a>`
       : "send us a message";
@@ -1296,327 +1296,144 @@ function initSiteLogic() {
 }
 
 // ─── CONFIRMATION DOWNLOAD ────────────────────────────────────────────────────
-function loadImageAsDataUrl(url) {
-  return new Promise(function(resolve) {
-    if (!url) { resolve(null); return; }
-    var img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = function() {
-      try {
-        var canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        canvas.getContext('2d').drawImage(img, 0, 0);
-        resolve(canvas.toDataURL('image/jpeg', 0.7));
-      } catch(e) { resolve(null); }
-    };
-    img.onerror = function() { resolve(null); };
-    img.src = url;
+function downloadConfirmation() {
+  if (!window._confirmationData) { alert('No confirmation data found.'); return; }
+  var d = window._confirmationData;
+
+  // Convert time to written words
+  var timeWords = d.time;
+  var hourMap = {'1':'one','2':'two','3':'three','4':'four','5':'five','6':'six','7':'seven','8':'eight','9':'nine','10':'ten','11':'eleven','12':'twelve'};
+  var tm = d.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (tm && hourMap[tm[1]]) {
+    var period = tm[3].toUpperCase() === 'AM' ? 'the morning' : (parseInt(tm[1]) >= 5 ? 'the evening' : 'the afternoon');
+    timeWords = hourMap[tm[1]] + ' in ' + period;
+  }
+
+  // Build response rows
+  var rowsHtml = '';
+  d.responses.forEach(function(r, i) {
+    var badge = r.attending
+      ? '<span class="badge accept">Joyfully Accepts</span>'
+      : '<span class="badge decline">Regretfully Declines</span>';
+    var dietary = r.dietary ? '<div class="dietary">' + r.dietary + '</div>' : '';
+    var sep = i < d.responses.length - 1 ? ' sep' : '';
+    rowsHtml += '<div class="row' + sep + '"><div class="row-inner"><span class="guest-name">' + r.name + '</span>' + badge + '</div>' + dietary + '</div>';
   });
-}
 
-function loadScript(url) {
-  return new Promise(function(resolve, reject) {
-    var s = document.createElement('script');
-    s.src = url;
-    s.onload = resolve;
-    s.onerror = reject;
-    document.head.appendChild(s);
-  });
-}
+  var photoUrl = CONFIG.confirmationImageUrl || CONFIG.heroImageUrl || '';
+  var photoBlock = photoUrl
+    ? '<div class="photo-wrap"><img src="' + photoUrl + '" alt=""><div class="photo-fade"></div></div>'
+    : '';
 
-async function ensureJsPDF() {
-  if (window.jspdf || window.jsPDF) return true;
-  var cdns = [
-    'https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js',
-    'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js'
-  ];
-  for (var i = 0; i < cdns.length; i++) {
-    try { await loadScript(cdns[i]); if (window.jspdf || window.jsPDF) return true; } catch(e) {}
-  }
-  return false;
-}
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500&display=swap" rel="stylesheet">'
+    + '<title>RSVP Confirmation</title>'
+    + '<style>'
+    + '*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }'
+    + 'html, body { background: #f7f4ef; }'
+    + '@page { size: 130mm auto; margin: 0; }'
+    + '.card { max-width: 130mm; margin: 0 auto; background: #fffdf9; border: 1px solid #e6ddd2; font-family: "Manrope", sans-serif; }'
+    + '@media print { body { background: #f7f4ef; } .card { border: none; box-shadow: none; } .no-print { display: none !important; } }'
 
-async function downloadConfirmation() {
-  if (!window._confirmationData) { alert('No confirmation data found. Please try again.'); return; }
+    // Photo
+    + '.photo-wrap { position: relative; width: 100%; height: 200px; overflow: hidden; }'
+    + '.photo-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; display: block; }'
+    + '.photo-fade { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to bottom, transparent, #fffdf9); }'
 
-  var btn = document.querySelector('#ty-actions .ty-email-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Loading…'; }
+    // Header
+    + '.header { text-align: center; padding: 0 24px 20px; }'
+    + '.subtitle { font-family: "Manrope", sans-serif; font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase; color: #8c857c; margin-bottom: 6px; }'
+    + '.names { font-family: "Cormorant Garamond", serif; font-size: 32px; font-weight: 300; color: #3a3530; line-height: 1.1; }'
+    + '.names .amp { font-style: italic; color: #b8895a; font-size: 26px; margin: 0 2px; }'
+    + '.tagline { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 13px; color: #8c857c; margin-top: 10px; font-weight: 300; }'
+    + '.gold-line { width: 40px; height: 1.5px; background: #d4b88f; margin: 16px auto; }'
 
-  var loaded = await ensureJsPDF();
-  if (!loaded) {
-    alert('Could not load the PDF library. Please check your internet connection and try again.');
-    if (btn) { btn.disabled = false; btn.textContent = 'Download Confirmation'; }
-    return;
-  }
+    // RSVP section
+    + '.rsvp-label { text-align: center; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #b8895a; font-weight: 500; margin-bottom: 16px; padding: 0 24px; }'
+    + '.responses { padding: 0 24px 8px; }'
+    + '.row { padding: 10px 0; }'
+    + '.row.sep { border-bottom: 1px solid #f0ebe1; }'
+    + '.row-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; }'
+    + '.guest-name { font-family: "Cormorant Garamond", serif; font-size: 17px; font-weight: 400; color: #3a3530; }'
+    + '.badge { font-size: 7px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 12px; border: 1px solid; white-space: nowrap; font-weight: 400; }'
+    + '.badge.accept { color: #b8895a; border-color: #b8895a; }'
+    + '.badge.decline { color: #8c857c; border-color: #aaa; }'
+    + '.dietary { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 12px; color: #8c857c; margin-top: 3px; padding-left: 4px; }'
+    + '.dietary::before { content: "\\2014\\00a0"; }'
 
-  var JsPDFConstructor = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
-  if (btn) { btn.textContent = 'Generating…'; }
+    // Dots divider
+    + '.dots { text-align: center; padding: 18px 0; letter-spacing: 6px; color: #d4b88f; font-size: 8px; }'
 
-  try {
-    var d = window._confirmationData;
+    // Event details
+    + '.event { text-align: center; padding: 0 24px; }'
+    + '.event-date { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 22px; color: #3a3530; font-weight: 400; }'
+    + '.event-time { font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: #8c857c; margin-top: 5px; font-weight: 400; }'
+    + '.venue-name { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: #3a3530; font-weight: 600; margin-top: 6px; }'
+    + '.venue-address { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 13px; color: #8c857c; margin-top: 3px; font-weight: 300; }'
 
-    // Load the photo from the photos folder (same approach as hero image)
-    var photoDataUrl = await loadImageAsDataUrl(CONFIG.confirmationImageUrl || CONFIG.heroImageUrl || null);
+    // Footer
+    + '.footer { text-align: center; padding: 20px 24px 10px; }'
+    + '.change-note { font-size: 9px; color: #8c857c; line-height: 1.6; font-weight: 300; }'
+    + '.change-note strong { font-weight: 600; color: #3a3530; }'
+    + '.site-link { display: inline-block; margin-top: 10px; font-size: 8px; letter-spacing: 0.1em; color: #b8895a; text-decoration: none; border-bottom: 1px solid #d4b88f; padding-bottom: 1px; }'
+    + '.signoff-line { width: 50px; height: 1px; background: #e6ddd2; margin: 18px auto; }'
+    + '.signoff { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 14px; color: #8c857c; padding-bottom: 24px; font-weight: 300; }'
+    + '.signoff .initials { color: #b8895a; font-style: italic; }'
 
-    // ── Layout constants
-    var pw = 130, margin = 14, cw = pw - margin * 2, cx = pw / 2;
-    var rowH = 9;
-    var dietaryRows = 0;
-    d.responses.forEach(function(r) { if (r.dietary) dietaryRows++; });
-    var photoH = photoDataUrl ? 52 : 0;
-    var totalH = 195 + photoH + d.responses.length * (rowH + 1) + dietaryRows * 5;
-    var ph = Math.max(totalH, 180);
+    // Print button
+    + '.print-bar { text-align: center; padding: 20px; }'
+    + '.print-btn { font-family: "Manrope", sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 32px; background: #3a3530; color: #fff; border: none; cursor: pointer; }'
+    + '.print-btn:hover { background: #b8895a; }'
+    + '</style></head><body>'
 
-    var pdf = new JsPDFConstructor({ unit: 'mm', format: [pw, ph] });
+    + '<div class="no-print print-bar"><button class="print-btn" onclick="window.print()">Save as PDF</button></div>'
 
-    // ── Colors
-    var GOLD = [184, 137, 90], DARK = [58, 53, 48], MID = [140, 133, 124];
-    var LINE = [212, 184, 143], BORDER = [230, 222, 210], BG = [250, 247, 242];
-    var CREAM = [255, 253, 249];
+    + '<div class="card">'
+    + photoBlock
 
-    // ── Full background
-    pdf.setFillColor(BG[0], BG[1], BG[2]);
-    pdf.rect(0, 0, pw, ph, 'F');
+    + '<div class="header">'
+    + '<p class="subtitle">The Wedding of</p>'
+    + '<p class="names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
+    + '<p class="tagline">Thank you for celebrating with us &mdash; your presence means the world.</p>'
+    + '<div class="gold-line"></div>'
+    + '</div>'
 
-    // ── White card with thin border
-    var cardX = 6, cardY = 6, cardW = pw - 12, cardH = ph - 12;
-    pdf.setFillColor(CREAM[0], CREAM[1], CREAM[2]);
-    pdf.rect(cardX, cardY, cardW, cardH, 'F');
-    pdf.setDrawColor(BORDER[0], BORDER[1], BORDER[2]);
-    pdf.setLineWidth(0.25);
-    pdf.rect(cardX, cardY, cardW, cardH, 'S');
+    + '<p class="rsvp-label">RSVP Confirmation</p>'
+    + '<div class="responses">' + rowsHtml + '</div>'
 
-    var y = cardY;
+    + '<div class="dots">&bull; &bull; &bull;</div>'
 
-    // ══════════════════════════════════════════════
-    // SECTION 1: Photo banner (tall, with fade)
-    // ══════════════════════════════════════════════
-    if (photoDataUrl) {
-      try {
-        var imgW = cardW, imgH = 50;
-        pdf.addImage(photoDataUrl, 'JPEG', cardX, y, imgW, imgH, undefined, 'FAST');
+    + '<div class="event">'
+    + '<p class="event-date">' + d.date + '</p>'
+    + '<p class="event-time">' + timeWords + '</p>'
+    + '</div>'
 
-        // Gradient fade: draw progressively more opaque cream rectangles at the bottom of the photo
-        for (var g = 0; g < 15; g++) {
-          var opacity = (g / 15) * 0.95;
-          var r = Math.round(CREAM[0] * opacity + 0 * (1 - opacity));
-          var gv = Math.round(CREAM[1] * opacity + 0 * (1 - opacity));
-          var b = Math.round(CREAM[2] * opacity + 0 * (1 - opacity));
-          pdf.setFillColor(r, gv, b);
-          pdf.setGState(new pdf.GState({ opacity: opacity }));
-          pdf.rect(cardX, y + imgH - 15 + g, imgW, 1.1, 'F');
-        }
-        pdf.setGState(new pdf.GState({ opacity: 1 }));
-        y += imgH - 6;
-      } catch(e) { y += 8; }
-    } else {
-      y += 12;
-    }
+    + '<div class="dots">&bull; &bull; &bull;</div>'
 
-    // ══════════════════════════════════════════════
-    // SECTION 2: "THE WEDDING OF" + couple names
-    // ══════════════════════════════════════════════
-    pdf.setFontSize(5.5);
-    pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(MID[0], MID[1], MID[2]);
-    pdf.text('THE WEDDING OF', cx, y, { align: 'center' });
-    y += 7;
+    + '<div class="event">'
+    + '<p class="venue-name">' + d.venue + '</p>'
+    + '<p class="venue-address">' + d.address + '</p>'
+    + '</div>'
 
-    // Couple names — large, elegant
-    pdf.setFontSize(22);
-    pdf.setTextColor(DARK[0], DARK[1], DARK[2]);
-    pdf.text(d.partner1 + ' ', cx - 1, y, { align: 'right' });
-    pdf.setFontSize(18);
-    pdf.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
-    pdf.setFont('helvetica', 'italic');
-    pdf.text('&', cx, y, { align: 'center' });
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(22);
-    pdf.setTextColor(DARK[0], DARK[1], DARK[2]);
-    pdf.text(' ' + d.partner2, cx + 1, y, { align: 'left' });
-    y += 7;
+    + '<div class="footer">'
+    + '<p class="change-note">Need to make changes? Re-enter your last name on the website<br>before <strong>' + d.deadline + '</strong>.</p>'
+    + '<a class="site-link" href="' + d.websiteUrl + '">' + d.websiteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '') + '</a>'
+    + '<div class="signoff-line"></div>'
+    + '<p class="signoff">with all our love &mdash; <span class="initials">' + d.partner1.charAt(0) + ' &amp; ' + d.partner2.charAt(0) + '</span></p>'
+    + '</div>'
 
-    // Tagline
-    pdf.setFontSize(7);
-    pdf.setFont('helvetica', 'italic');
-    pdf.setTextColor(MID[0], MID[1], MID[2]);
-    pdf.text('Thank you for celebrating with us \u2014 your presence means the world.', cx, y, { align: 'center' });
-    pdf.setFont('helvetica', 'normal');
-    y += 7;
+    + '</div>'
+    + '</body></html>';
 
-    // Gold divider line
-    pdf.setDrawColor(LINE[0], LINE[1], LINE[2]);
-    pdf.setLineWidth(0.4);
-    pdf.line(cx - 10, y, cx + 10, y);
-    y += 7;
-
-    // ══════════════════════════════════════════════
-    // SECTION 3: RSVP Confirmation label
-    // ══════════════════════════════════════════════
-    pdf.setFontSize(6.5);
-    pdf.setFont('helvetica', 'normal');
-    pdf.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
-    pdf.text('RSVP CONFIRMATION', cx, y, { align: 'center' });
-    y += 8;
-
-    // ══════════════════════════════════════════════
-    // SECTION 4: Response rows
-    // ══════════════════════════════════════════════
-    d.responses.forEach(function(r, i) {
-      // Name
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-      pdf.setTextColor(DARK[0], DARK[1], DARK[2]);
-      pdf.text(r.name, margin + 2, y);
-
-      // Badge
-      var label = r.attending ? 'JOYFULLY ACCEPTS' : 'REGRETFULLY DECLINES';
-      var bc = r.attending ? GOLD : MID;
-      pdf.setFontSize(4.5);
-      pdf.setTextColor(bc[0], bc[1], bc[2]);
-      var tw = pdf.getTextWidth(label);
-      var bx = pw - margin - 2 - tw - 5;
-      pdf.setDrawColor(bc[0], bc[1], bc[2]);
-      pdf.setLineWidth(0.18);
-      pdf.rect(bx, y - 2.8, tw + 5, 4.5, 'S');
-      pdf.text(label, bx + 2.5, y + 0.2);
-
-      // Per-person dietary (indented, italic)
-      if (r.dietary) {
-        y += 4.5;
-        pdf.setFontSize(6.5);
-        pdf.setTextColor(MID[0], MID[1], MID[2]);
-        pdf.setFont('helvetica', 'italic');
-        pdf.text('\u2014 ' + r.dietary, margin + 6, y);
-        pdf.setFont('helvetica', 'normal');
-      }
-
-      y += rowH;
-
-      // Separator line
-      if (i < d.responses.length - 1) {
-        pdf.setDrawColor(238, 234, 226);
-        pdf.setLineWidth(0.1);
-        pdf.line(margin + 2, y - 3.5, pw - margin - 2, y - 3.5);
-      }
-    });
-
-    y += 5;
-
-    // ══════════════════════════════════════════════
-    // Three-dot divider
-    // ══════════════════════════════════════════════
-    pdf.setFillColor(LINE[0], LINE[1], LINE[2]);
-    pdf.circle(cx - 4, y, 0.5, 'F');
-    pdf.circle(cx, y, 0.5, 'F');
-    pdf.circle(cx + 4, y, 0.5, 'F');
-    y += 8;
-
-    // ══════════════════════════════════════════════
-    // SECTION 5: Date & Time (written out)
-    // ══════════════════════════════════════════════
-    pdf.setFont('helvetica', 'italic');
-    pdf.setFontSize(12);
-    pdf.setTextColor(DARK[0], DARK[1], DARK[2]);
-    pdf.text(d.date, cx, y, { align: 'center' });
-    y += 5;
-
-    // Written-out time
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(5.5);
-    pdf.setTextColor(MID[0], MID[1], MID[2]);
-    // Convert "4:00 PM" to "FOUR IN THE AFTERNOON" style
-    var timeWords = d.time;
-    var hourWords = {'1':'ONE','2':'TWO','3':'THREE','4':'FOUR','5':'FIVE','6':'SIX','7':'SEVEN','8':'EIGHT','9':'NINE','10':'TEN','11':'ELEVEN','12':'TWELVE'};
-    var tm = d.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
-    if (tm) {
-      var hr = tm[1], period = tm[3].toUpperCase() === 'AM' ? 'THE MORNING' : (parseInt(tm[1]) >= 5 ? 'THE EVENING' : 'THE AFTERNOON');
-      if (hourWords[hr]) timeWords = hourWords[hr] + ' IN ' + period;
-    }
-    pdf.text(timeWords, cx, y, { align: 'center' });
-    y += 7;
-
-    // Three-dot divider
-    pdf.setFillColor(LINE[0], LINE[1], LINE[2]);
-    pdf.circle(cx - 3, y, 0.35, 'F');
-    pdf.circle(cx, y, 0.35, 'F');
-    pdf.circle(cx + 3, y, 0.35, 'F');
-    y += 7;
-
-    // ══════════════════════════════════════════════
-    // SECTION 6: Venue
-    // ══════════════════════════════════════════════
-    pdf.setFontSize(6);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(DARK[0], DARK[1], DARK[2]);
-    pdf.text(d.venue.toUpperCase(), cx, y, { align: 'center' });
-    y += 4;
-    pdf.setFont('helvetica', 'italic');
-    pdf.setFontSize(7);
-    pdf.setTextColor(MID[0], MID[1], MID[2]);
-    pdf.text(d.address, cx, y, { align: 'center' });
-    y += 9;
-
-    // ══════════════════════════════════════════════
-    // SECTION 7: Change note + website link
-    // ══════════════════════════════════════════════
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(6);
-    pdf.setTextColor(MID[0], MID[1], MID[2]);
-    pdf.text('Need to make changes? Re-enter your last name on the website', cx, y, { align: 'center' });
-    y += 3.5;
-    pdf.text('before ', cx, y, { align: 'center' });
-    // Bold the deadline
-    var beforeW = pdf.getTextWidth('before ');
-    pdf.setFont('helvetica', 'bold');
-    pdf.text(d.deadline, cx - beforeW / 2 + beforeW, y);
-    var deadlineW = pdf.getTextWidth(d.deadline);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text('.', cx - beforeW / 2 + beforeW + deadlineW, y);
-    y += 6;
-
-    // Website link
-    pdf.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
-    pdf.setFontSize(5.5);
-    var linkLabel = d.websiteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '');
-    var lw = pdf.getTextWidth(linkLabel);
-    pdf.textWithLink(linkLabel, cx - lw / 2, y, { url: d.websiteUrl });
-    pdf.setDrawColor(GOLD[0], GOLD[1], GOLD[2]);
-    pdf.setLineWidth(0.12);
-    pdf.line(cx - lw / 2, y + 0.5, cx + lw / 2, y + 0.5);
-    y += 10;
-
-    // ══════════════════════════════════════════════
-    // SECTION 8: Warm sign-off
-    // ══════════════════════════════════════════════
-    // Thin separator
-    pdf.setDrawColor(BORDER[0], BORDER[1], BORDER[2]);
-    pdf.setLineWidth(0.15);
-    pdf.line(cx - 20, y, cx + 20, y);
-    y += 6;
-
-    pdf.setFont('helvetica', 'italic');
-    pdf.setFontSize(8);
-    pdf.setTextColor(MID[0], MID[1], MID[2]);
-    var p1Initial = d.partner1.charAt(0);
-    var p2Initial = d.partner2.charAt(0);
-    pdf.text('with all our love \u2014 ', cx, y, { align: 'center' });
-    // Add initials in gold
-    var loveW = pdf.getTextWidth('with all our love \u2014 ');
-    pdf.setTextColor(GOLD[0], GOLD[1], GOLD[2]);
-    var initials = p1Initial + ' & ' + p2Initial;
-    pdf.text(initials, cx + loveW / 2, y);
-
-    pdf.save('rsvp-confirmation.pdf');
-  } catch (err) {
-    console.error('PDF generation failed:', err);
-    alert('Something went wrong generating the PDF. Error: ' + err.message);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Download Confirmation'; }
+  var w = window.open('', '_blank');
+  if (w) {
+    w.document.write(html);
+    w.document.close();
+  } else {
+    alert('Pop-up blocked. Please allow pop-ups for this site and try again.');
   }
 }
+
 
 // ─── FAQ ───────────────────────────────────────────────────────────────────────
 function toggleFaq(btn) {
