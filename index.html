@@ -1276,7 +1276,7 @@ function initSiteLogic() {
     };
 
     const actionsEl = document.getElementById("ty-actions");
-    let actionsHtml = `<button class="ty-email-btn" onclick="downloadConfirmation()" style="cursor:pointer">View Confirmation</button>`;
+    let actionsHtml = `<button class="ty-email-btn" onclick="downloadConfirmation()" style="cursor:pointer">Save Confirmation</button>`;
     const contactLink = CONFIG.contactEmail
       ? `<a href="mailto:${CONFIG.contactEmail}">send us a message</a>`
       : "send us a message";
@@ -1296,141 +1296,166 @@ function initSiteLogic() {
 }
 
 // ─── CONFIRMATION DOWNLOAD ────────────────────────────────────────────────────
-function downloadConfirmation() {
+async function downloadConfirmation() {
   if (!window._confirmationData) { alert('No confirmation data found.'); return; }
-  var d = window._confirmationData;
 
-  // Convert time to written words
-  var timeWords = d.time;
-  var hourMap = {'1':'one','2':'two','3':'three','4':'four','5':'five','6':'six','7':'seven','8':'eight','9':'nine','10':'ten','11':'eleven','12':'twelve'};
-  var tm = d.time.match(/(\d+):(\d+)\s*(AM|PM)/i);
-  if (tm && hourMap[tm[1]]) {
-    var period = tm[3].toUpperCase() === 'AM' ? 'the morning' : (parseInt(tm[1]) >= 5 ? 'the evening' : 'the afternoon');
-    timeWords = hourMap[tm[1]] + ' in ' + period;
-  }
+  var btn = document.querySelector('#ty-actions .ty-email-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
+
+  var d = window._confirmationData;
 
   // Build response rows
   var rowsHtml = '';
   d.responses.forEach(function(r, i) {
     var badge = r.attending
-      ? '<span class="badge accept">Joyfully Accepts</span>'
-      : '<span class="badge decline">Regretfully Declines</span>';
-    var dietary = r.dietary ? '<div class="dietary">' + r.dietary + '</div>' : '';
-    var sep = i < d.responses.length - 1 ? ' sep' : '';
-    rowsHtml += '<div class="row' + sep + '"><div class="row-inner"><span class="guest-name">' + r.name + '</span>' + badge + '</div>' + dietary + '</div>';
+      ? '<span class="badge accept">Accepts</span>'
+      : '<span class="badge decline">Declines</span>';
+    var dietary = r.dietary ? '<span class="dietary">&mdash; <em>' + r.dietary + '</em></span>' : '';
+    rowsHtml += '<div class="row"><span class="guest-name">' + r.name + '</span>' + dietary + '<span class="row-line"></span>' + badge + '</div>';
   });
 
   var photoUrl = CONFIG.confirmationImageUrl || CONFIG.heroImageUrl || '';
-  var photoBlock = photoUrl
-    ? '<div class="photo-wrap"><img src="' + photoUrl + '" alt=""><div class="photo-fade"></div></div>'
-    : '';
+  var photoStyle = photoUrl
+    ? 'background-image:url(' + photoUrl + ');background-size:cover;background-position:center 20%;'
+    : 'background:#3a3530;';
 
-  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-    + '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500&display=swap" rel="stylesheet">'
-    + '<title>RSVP Confirmation</title>'
+  var siteLabel = d.websiteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '').toUpperCase().replace(/\//g, ' / ');
+
+  var html = '<div class="conf-card">'
     + '<style>'
-    + '*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }'
-    + 'html, body { background: #f7f4ef; }'
-    + '@page { size: 130mm auto; margin: 0; }'
-    + '.card { max-width: 130mm; margin: 0 auto; background: #fffdf9; border: 1px solid #e6ddd2; font-family: "Manrope", sans-serif; }'
-    + '@media print { body { background: #f7f4ef; } .card { border: none; box-shadow: none; } .no-print { display: none !important; } }'
+    + '@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap");'
+    + '.conf-card * { box-sizing:border-box; margin:0; padding:0; }'
+    + '.conf-card { width:520px; font-family:"Manrope",sans-serif; background:#fffdf9; }'
 
-    // Photo
-    + '.photo-wrap { position: relative; width: 100%; height: 200px; overflow: hidden; }'
-    + '.photo-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; display: block; }'
-    + '.photo-fade { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to bottom, transparent, #fffdf9); }'
+    // Hero with text overlay
+    + '.hero { position:relative; width:100%; height:480px; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; text-align:center; padding:0 40px 40px; color:#fff; }'
+    + '.hero-bg { position:absolute; inset:0; ' + photoStyle + ' }'
+    + '.hero-fade { position:absolute; inset:0; background:linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.45) 100%); }'
+    + '.hero * { position:relative; z-index:1; }'
+    + '.hero .h-sub { font-size:10px; letter-spacing:0.35em; text-transform:uppercase; margin-bottom:10px; font-weight:400; opacity:0.9; }'
+    + '.hero .h-names { font-family:"Cormorant Garamond",serif; font-size:52px; font-weight:300; line-height:1.1; }'
+    + '.hero .h-names .amp { font-style:italic; color:#d4b88f; font-size:44px; margin:0 2px; }'
+    + '.hero .h-line { width:36px; height:1.5px; background:rgba(255,255,255,0.5); margin:16px auto; }'
+    + '.hero .h-tagline { font-family:"Cormorant Garamond",serif; font-style:italic; font-size:17px; font-weight:300; opacity:0.92; line-height:1.5; }'
 
-    // Header
-    + '.header { text-align: center; padding: 0 24px 20px; }'
-    + '.subtitle { font-family: "Manrope", sans-serif; font-size: 8px; letter-spacing: 0.25em; text-transform: uppercase; color: #8c857c; margin-bottom: 6px; }'
-    + '.names { font-family: "Cormorant Garamond", serif; font-size: 32px; font-weight: 300; color: #3a3530; line-height: 1.1; }'
-    + '.names .amp { font-style: italic; color: #b8895a; font-size: 26px; margin: 0 2px; }'
-    + '.tagline { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 13px; color: #8c857c; margin-top: 10px; font-weight: 300; }'
-    + '.gold-line { width: 40px; height: 1.5px; background: #d4b88f; margin: 16px auto; }'
+    // Body
+    + '.body { padding:28px 40px 40px; }'
 
-    // RSVP section
-    + '.rsvp-label { text-align: center; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #b8895a; font-weight: 500; margin-bottom: 16px; padding: 0 24px; }'
-    + '.responses { padding: 0 24px 8px; }'
-    + '.row { padding: 10px 0; }'
-    + '.row.sep { border-bottom: 1px solid #f0ebe1; }'
-    + '.row-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; }'
-    + '.guest-name { font-family: "Cormorant Garamond", serif; font-size: 17px; font-weight: 400; color: #3a3530; }'
-    + '.badge { font-size: 7px; letter-spacing: 0.12em; text-transform: uppercase; padding: 4px 12px; border: 1px solid; white-space: nowrap; font-weight: 400; }'
-    + '.badge.accept { color: #b8895a; border-color: #b8895a; }'
-    + '.badge.decline { color: #8c857c; border-color: #aaa; }'
-    + '.dietary { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 12px; color: #8c857c; margin-top: 3px; padding-left: 4px; }'
-    + '.dietary::before { content: "\\2014\\00a0"; }'
+    // RSVP label with side lines
+    + '.rsvp-header { display:flex; align-items:center; gap:14px; margin-bottom:24px; }'
+    + '.rsvp-header .rh-line { flex:1; height:1px; background:#e0d9cf; }'
+    + '.rsvp-header .rh-text { font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#b8895a; font-weight:500; white-space:nowrap; }'
 
-    // Dots divider
-    + '.dots { text-align: center; padding: 18px 0; letter-spacing: 6px; color: #d4b88f; font-size: 8px; }'
+    // Response rows
+    + '.row { display:flex; align-items:baseline; gap:10px; padding:12px 0; }'
+    + '.row + .row { border-top:1px solid #f0ebe1; }'
+    + '.guest-name { font-family:"Cormorant Garamond",serif; font-size:22px; font-weight:400; color:#3a3530; white-space:nowrap; }'
+    + '.dietary { font-family:"Cormorant Garamond",serif; font-size:14px; color:#8c857c; white-space:nowrap; }'
+    + '.row-line { flex:1; border-bottom:1px solid #e8e2d8; margin-bottom:4px; min-width:20px; }'
+    + '.badge { font-size:8px; letter-spacing:0.14em; text-transform:uppercase; padding:5px 14px; border:1px solid; white-space:nowrap; font-weight:400; }'
+    + '.badge.accept { color:#b8895a; border-color:#c9a76e; }'
+    + '.badge.decline { color:#8c857c; border-color:#aaa; }'
 
-    // Event details
-    + '.event { text-align: center; padding: 0 24px; }'
-    + '.event-date { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 22px; color: #3a3530; font-weight: 400; }'
-    + '.event-time { font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase; color: #8c857c; margin-top: 5px; font-weight: 400; }'
-    + '.venue-name { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: #3a3530; font-weight: 600; margin-top: 6px; }'
-    + '.venue-address { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 13px; color: #8c857c; margin-top: 3px; font-weight: 300; }'
+    // Event section
+    + '.event-section { border-top:1px solid #e0d9cf; margin-top:20px; padding-top:22px; text-align:center; }'
+    + '.event-datetime { font-family:"Cormorant Garamond",serif; font-size:26px; font-weight:400; color:#3a3530; }'
+    + '.event-datetime .dot { margin:0 6px; color:#c9a76e; }'
+    + '.event-venue { font-size:10px; letter-spacing:0.18em; text-transform:uppercase; color:#3a3530; font-weight:600; margin-top:6px; }'
 
     // Footer
-    + '.footer { text-align: center; padding: 20px 24px 10px; }'
-    + '.change-note { font-size: 9px; color: #8c857c; line-height: 1.6; font-weight: 300; }'
-    + '.change-note strong { font-weight: 600; color: #3a3530; }'
-    + '.site-link { display: inline-block; margin-top: 10px; font-size: 8px; letter-spacing: 0.1em; color: #b8895a; text-decoration: none; border-bottom: 1px solid #d4b88f; padding-bottom: 1px; }'
-    + '.signoff-line { width: 50px; height: 1px; background: #e6ddd2; margin: 18px auto; }'
-    + '.signoff { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 14px; color: #8c857c; padding-bottom: 24px; font-weight: 300; }'
-    + '.signoff .initials { color: #b8895a; font-style: italic; }'
+    + '.footer-section { border-top:1px solid #e0d9cf; margin-top:22px; padding-top:20px; text-align:center; }'
+    + '.change-note { font-size:11px; color:#8c857c; line-height:1.6; font-weight:300; }'
+    + '.change-note strong { font-weight:600; color:#3a3530; }'
+    + '.site-link { display:inline-block; margin-top:10px; font-size:9px; letter-spacing:0.14em; color:#b8895a; text-decoration:none; border-bottom:1px solid #d4b88f; padding-bottom:2px; font-weight:500; }'
 
-    // Print button
-    + '.print-bar { text-align: center; padding: 20px; }'
-    + '.print-btn { font-family: "Manrope", sans-serif; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; padding: 12px 32px; background: #3a3530; color: #fff; border: none; cursor: pointer; }'
-    + '.print-btn:hover { background: #b8895a; }'
-    + '</style></head><body>'
+    // Bottom pad
+    + '.bottom-pad { height:50px; }'
+    + '</style>'
 
-    + '<div class="no-print print-bar"><button class="print-btn" onclick="window.print()">Save as PDF</button></div>'
-
-    + '<div class="card">'
-    + photoBlock
-
-    + '<div class="header">'
-    + '<p class="subtitle">The Wedding of</p>'
-    + '<p class="names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
-    + '<p class="tagline">Thank you for celebrating with us &mdash; your presence means the world.</p>'
-    + '<div class="gold-line"></div>'
+    + '<div class="hero"><div class="hero-bg"></div><div class="hero-fade"></div>'
+    + '<p class="h-sub">The Wedding of</p>'
+    + '<p class="h-names">' + d.partner1 + ' <span class="amp">&amp;</span> ' + d.partner2 + '</p>'
+    + '<div class="h-line"></div>'
+    + '<p class="h-tagline">Thank you for celebrating with us, your presence means the world.</p>'
     + '</div>'
 
-    + '<p class="rsvp-label">RSVP Confirmation</p>'
-    + '<div class="responses">' + rowsHtml + '</div>'
+    + '<div class="body">'
 
-    + '<div class="dots">&bull; &bull; &bull;</div>'
+    + '<div class="rsvp-header"><span class="rh-line"></span><span class="rh-text">RSVP Confirmation</span><span class="rh-line"></span></div>'
+    + rowsHtml
 
-    + '<div class="event">'
-    + '<p class="event-date">' + d.date + '</p>'
-    + '<p class="event-time">' + timeWords + '</p>'
+    + '<div class="event-section">'
+    + '<p class="event-datetime">' + d.date + '<span class="dot">&middot;</span>' + d.time + '</p>'
+    + '<p class="event-venue">' + d.venue + '</p>'
     + '</div>'
 
-    + '<div class="dots">&bull; &bull; &bull;</div>'
-
-    + '<div class="event">'
-    + '<p class="venue-name">' + d.venue + '</p>'
-    + '<p class="venue-address">' + d.address + '</p>'
+    + '<div class="footer-section">'
+    + '<p class="change-note">To make changes, re-enter your name on the website before <strong>' + d.deadline + '</strong>.</p>'
+    + '<span class="site-link">' + siteLabel + '</span>'
     + '</div>'
 
-    + '<div class="footer">'
-    + '<p class="change-note">Need to make changes? Re-enter your last name on the website<br>before <strong>' + d.deadline + '</strong>.</p>'
-    + '<a class="site-link" href="' + d.websiteUrl + '">' + d.websiteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '') + '</a>'
-    + '<div class="signoff-line"></div>'
-    + '<p class="signoff">with all our love &mdash; <span class="initials">' + d.partner1.charAt(0) + ' &amp; ' + d.partner2.charAt(0) + '</span></p>'
-    + '</div>'
+    + '<div class="bottom-pad"></div>'
+    + '</div></div>';
 
-    + '</div>'
-    + '</body></html>';
+  // Create off-screen container
+  var container = document.createElement('div');
+  container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;';
+  container.innerHTML = html;
+  document.body.appendChild(container);
 
-  var w = window.open('', '_blank');
-  if (w) {
-    w.document.write(html);
-    w.document.close();
-  } else {
-    alert('Pop-up blocked. Please allow pop-ups for this site and try again.');
+  try {
+    await document.fonts.ready;
+    // Wait for background image to load
+    if (photoUrl) {
+      await new Promise(function(resolve) {
+        var img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = resolve;
+        img.onerror = resolve;
+        setTimeout(resolve, 3000);
+        img.src = photoUrl;
+      });
+    }
+    await new Promise(function(r) { setTimeout(r, 600); });
+
+    // Load html2canvas dynamically
+    if (!window.html2canvas) {
+      await new Promise(function(resolve, reject) {
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        s.onload = resolve;
+        s.onerror = function() {
+          var s2 = document.createElement('script');
+          s2.src = 'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js';
+          s2.onload = resolve;
+          s2.onerror = reject;
+          document.head.appendChild(s2);
+        };
+        document.head.appendChild(s);
+      });
+    }
+
+    var card = container.querySelector('.conf-card');
+    var canvas = await html2canvas(card, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#fffdf9',
+      logging: false
+    });
+
+    var link = document.createElement('a');
+    link.download = 'rsvp-confirmation.png';
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+  } catch (err) {
+    console.error('Confirmation generation failed:', err);
+    alert('Something went wrong. Please try again.');
+  } finally {
+    document.body.removeChild(container);
+    if (btn) { btn.disabled = false; btn.textContent = 'Save Confirmation'; }
   }
 }
 
