@@ -1392,8 +1392,15 @@ async function downloadConfirmation() {
     if (btn) { btn.textContent = 'Generating image…'; }
 
     var container = document.createElement('div');
-    container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;';
-    container.innerHTML = '<div class="conf-card"><style>' + cardStyles + '</style>' + heroHtml + bodyHtml + '</div>';
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;width:390px;';
+    container.innerHTML = '<div class="conf-card" style="width:390px;"><style>' + cardStyles
+      + '.hero-img { aspect-ratio:auto !important; max-height:360px; width:100%; object-fit:cover; object-position:center 20%; }'
+      + '.h-names { font-size:30px !important; } .h-names .amp { font-size:24px !important; }'
+      + '.h-tagline { font-size:12px !important; } .h-sub { font-size:8px !important; }'
+      + '.hero-content { bottom:14px !important; padding:0 18px !important; }'
+      + '.guest-name { font-size:17px !important; } .dietary { font-size:11px !important; }'
+      + '.event-datetime { font-size:20px !important; }'
+      + '</style>' + heroHtml + bodyHtml + '</div>';
     document.body.appendChild(container);
 
     try {
