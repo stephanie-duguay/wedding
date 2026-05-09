@@ -1317,7 +1317,6 @@ async function downloadConfirmation() {
   var photoUrl = CONFIG.confirmationImageUrl || CONFIG.heroImageUrl || '';
   var siteLabel = d.websiteUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '').toUpperCase().replace(/\//g, ' / ');
 
-  // Shared card styles
   var cardStyles = ''
     + '@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap");'
     + '.conf-card * { box-sizing:border-box; margin:0; padding:0; }'
@@ -1357,7 +1356,6 @@ async function downloadConfirmation() {
     + '.change-note strong { font-weight:600; color:#3a3530; }'
     + '.site-link { display:inline-block; margin-top:7px; font-family:"Manrope",Arial,sans-serif; font-size:9px; letter-spacing:0.12em; color:#b8895a; text-decoration:none; font-weight:500; border-bottom:1px solid #d4b88f; padding-bottom:1px; }';
 
-  // Shared card HTML (no wrapper page, just the card content)
   var heroHtml = photoUrl
     ? '<div class="hero"><img class="hero-img" src="' + photoUrl + '" crossorigin="anonymous"><div class="hero-gradient"></div><div class="hero-content">'
       + '<p class="h-sub">The Wedding of</p>'
@@ -1386,7 +1384,7 @@ async function downloadConfirmation() {
     + '</div>';
 
   // ═══════════════════════════════════════
-  // MOBILE: render as image via html2canvas
+  // MOBILE: render image, navigate to it
   // ═══════════════════════════════════════
   if (isMobile) {
     if (btn) { btn.textContent = 'Generating image…'; }
@@ -1399,7 +1397,6 @@ async function downloadConfirmation() {
     document.body.appendChild(container);
 
     try {
-      // Wait for image to load
       var heroImg = container.querySelector('.hero-img');
       if (heroImg && !heroImg.complete) {
         await new Promise(function(resolve) {
@@ -1408,11 +1405,9 @@ async function downloadConfirmation() {
           setTimeout(resolve, 4000);
         });
       }
-      // Wait for fonts
       if (document.fonts && document.fonts.ready) await document.fonts.ready;
       await new Promise(function(r) { setTimeout(r, 600); });
 
-      // Load html2canvas
       if (!window.html2canvas) {
         await new Promise(function(resolve, reject) {
           var s = document.createElement('script');
@@ -1431,21 +1426,30 @@ async function downloadConfirmation() {
 
       var card = container.querySelector('.conf-card');
       var canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fffdf9', logging: false });
-
-      // Show image inline — replace the button area with the rendered image
       var imgDataUrl = canvas.toDataURL('image/png');
-      var actionsEl = document.getElementById('ty-actions');
-      if (actionsEl) {
-        actionsEl.innerHTML = '<div style="text-align:center;padding:8px 0;">'
-          + '<img src="' + imgDataUrl + '" alt="RSVP Confirmation" style="width:100%;max-width:420px;display:block;margin:0 auto;border:1px solid #ebe4d4;">'
-          + '<p style="margin-top:12px;font-size:13px;color:#7a7268;font-family:Manrope,sans-serif;font-weight:300;line-height:1.5;">Press and hold the image to save to your photos.</p>'
-          + '</div>';
-      }
+
+      // Navigate current page to the image with save instructions and website link
+      document.body.removeChild(container);
+      document.open();
+      document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RSVP Confirmation</title>'
+        + '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500&display=swap" rel="stylesheet">'
+        + '<style>*{box-sizing:border-box;margin:0;padding:0;}body{background:#f7f4ef;font-family:"Manrope",Arial,sans-serif;padding:16px 16px 32px;}'
+        + 'img{width:100%;max-width:520px;display:block;margin:0 auto;border:1px solid #ebe4d4;}'
+        + '.hint{margin-top:16px;font-size:14px;color:#7a7268;text-align:center;line-height:1.6;font-weight:300;}'
+        + '.back-link{display:block;margin-top:16px;text-align:center;font-size:13px;color:#b8895a;text-decoration:none;font-weight:500;letter-spacing:0.05em;}'
+        + '</style></head><body>'
+        + '<img src="' + imgDataUrl + '" alt="RSVP Confirmation">'
+        + '<p class="hint">Press and hold the image to save to your photos.</p>'
+        + '<a class="back-link" href="' + d.websiteUrl + '">Return to Wedding Website</a>'
+        + '</body></html>');
+      document.close();
+      return;
+
     } catch(err) {
       console.error('Image generation failed:', err);
+      if (container.parentNode) document.body.removeChild(container);
       alert('Could not generate image. Please take a screenshot instead.');
     } finally {
-      document.body.removeChild(container);
       if (btn) { btn.disabled = false; btn.textContent = 'Save Confirmation'; }
     }
     return;
