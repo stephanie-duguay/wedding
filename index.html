@@ -1245,8 +1245,8 @@ function initSiteLogic() {
       : "";
 
     if (anyAttending) {
-      tyHeadline.textContent = isMultiSubmit ? "We can't wait to see you!" : `We can't wait to see you, ${firstName}!`;
-      tyMessage.innerHTML = `<p>Thank you${isMultiSubmit ? ` to the ${currentParty.partyName} party` : ""} for your RSVP — we've received your response.</p>${skippedNote}`;
+      tyHeadline.textContent = "Thank you for your response!";
+      tyMessage.innerHTML = `<p>We can't wait to celebrate together.</p>${skippedNote}`;
     } else if (allDeclining) {
       tyHeadline.textContent = "Thank you for letting us know";
       tyMessage.innerHTML = `<p>We're sorry${isMultiSubmit ? ` the ${currentParty.partyName} party` : ` you, ${firstName},`} won't be able to make it — you'll be missed!</p>${skippedNote}<p class="ty-secondary">We hope to celebrate with you another time.</p>`;
@@ -1324,14 +1324,14 @@ function downloadConfirmation() {
     + '.card { width:100%; max-width:600px; margin:0 auto; background:#fffdf9; }'
 
     + '.hero { position:relative; width:100%; overflow:hidden; }'
-    + '.hero-img { display:block; width:100%; }'
+    + '.hero-img { display:block; width:100%; aspect-ratio:1/1; object-fit:cover; object-position:center 20%; }'
     + '.hero-gradient { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,0) 20%, rgba(0,0,0,0.55) 100%); }'
     + '.hero-content { position:absolute; bottom:20px; left:0; right:0; text-align:center; color:#fff; z-index:2; padding:0 28px; }'
-    + '.h-sub { font-family:"Manrope",Arial,sans-serif; font-size:9px; letter-spacing:0.35em; text-transform:uppercase; margin-bottom:6px; opacity:0.9; }'
-    + '.h-names { font-family:"Cormorant Garamond","Georgia",serif; font-size:38px; font-weight:300; line-height:1.15; }'
-    + '.h-names .amp { font-style:italic; color:#d4b88f; font-size:32px; margin:0 3px; }'
+    + '.h-sub { font-family:"Manrope",Arial,sans-serif; font-size:10px; letter-spacing:0.35em; text-transform:uppercase; margin-bottom:6px; opacity:0.9; }'
+    + '.h-names { font-family:"Cormorant Garamond","Georgia",serif; font-size:42px; font-weight:300; line-height:1.15; }'
+    + '.h-names .amp { font-style:italic; color:#d4b88f; font-size:35px; margin:0 3px; }'
     + '.h-line { width:30px; height:1px; background:rgba(255,255,255,0.5); margin:12px auto; }'
-    + '.h-tagline { font-family:"Cormorant Garamond","Georgia",serif; font-style:italic; font-size:13px; font-weight:300; opacity:0.92; line-height:1.5; }'
+    + '.h-tagline { font-family:"Cormorant Garamond","Georgia",serif; font-style:italic; font-size:15px; font-weight:300; opacity:0.92; line-height:1.5; }'
 
     + '.header-plain { text-align:center; padding:32px 28px 20px; }'
     + '.header-plain .h-sub { color:#8c857c; }'
@@ -1344,27 +1344,27 @@ function downloadConfirmation() {
 
     + '.rsvp-header { display:flex; align-items:center; gap:12px; margin-bottom:14px; }'
     + '.rh-line { flex:1; height:1px; background:#e0d9cf; }'
-    + '.rh-text { font-family:"Manrope",Arial,sans-serif; font-size:8px; letter-spacing:0.2em; text-transform:uppercase; color:#b8895a; font-weight:500; white-space:nowrap; }'
+    + '.rh-text { font-family:"Manrope",Arial,sans-serif; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:#b8895a; font-weight:500; white-space:nowrap; }'
 
     + '.row { display:flex; align-items:baseline; gap:7px; padding:8px 0; }'
-    + '.guest-name { font-family:"Cormorant Garamond","Georgia",serif; font-size:17px; font-weight:400; color:#3a3530; white-space:nowrap; }'
-    + '.dietary { font-family:"Cormorant Garamond","Georgia",serif; font-size:11px; color:#8c857c; white-space:nowrap; }'
+    + '.guest-name { font-family:"Cormorant Garamond","Georgia",serif; font-size:20px; font-weight:400; color:#3a3530; white-space:nowrap; }'
+    + '.dietary { font-family:"Cormorant Garamond","Georgia",serif; font-size:13px; color:#8c857c; white-space:nowrap; }'
     + '.row-line { flex:1; border-bottom:1px solid #e8e2d8; margin-bottom:3px; min-width:14px; }'
-    + '.badge { font-family:"Manrope",Arial,sans-serif; font-size:6px; letter-spacing:0.12em; text-transform:uppercase; padding:3px 10px; border:1px solid; white-space:nowrap; }'
+    + '.badge { font-family:"Manrope",Arial,sans-serif; font-size:8px; letter-spacing:0.12em; text-transform:uppercase; padding:4px 12px; border:1px solid; white-space:nowrap; }'
     + '.badge.accept { color:#b8895a; border-color:#c9a76e; }'
     + '.badge.decline { color:#8c857c; border-color:#aaa; }'
 
     + '.event-section { border-top:1px solid #e0d9cf; margin-top:12px; padding-top:14px; text-align:center; }'
-    + '.event-datetime { font-family:"Cormorant Garamond","Georgia",serif; font-size:20px; font-weight:400; color:#3a3530; }'
+    + '.event-datetime { font-family:"Cormorant Garamond","Georgia",serif; font-size:24px; font-weight:400; color:#3a3530; }'
     + '.event-datetime .dot { margin:0 3px; color:#c9a76e; }'
-    + '.event-venue { font-family:"Manrope",Arial,sans-serif; font-size:8px; letter-spacing:0.16em; text-transform:uppercase; color:#3a3530; font-weight:600; margin-top:4px; }'
+    + '.event-venue { font-family:"Manrope",Arial,sans-serif; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:#3a3530; font-weight:600; margin-top:4px; }'
 
-    + '.footer-section { border-top:1px solid #e0d9cf; margin-top:12px; padding:12px 0 22px; text-align:center; }'
-    + '.change-note { font-family:"Manrope",Arial,sans-serif; font-size:9px; color:#8c857c; line-height:1.6; font-weight:300; }'
+    + '.footer-section { border-top:1px solid #e0d9cf; margin-top:12px; padding:12px 0 24px; text-align:center; }'
+    + '.change-note { font-family:"Manrope",Arial,sans-serif; font-size:11px; color:#8c857c; line-height:1.6; font-weight:300; }'
     + '.change-note strong { font-weight:600; color:#3a3530; }'
-    + '.site-link { display:inline-block; margin-top:7px; font-family:"Manrope",Arial,sans-serif; font-size:7px; letter-spacing:0.12em; color:#b8895a; text-decoration:none; font-weight:500; border-bottom:1px solid #d4b88f; padding-bottom:1px; }'
+    + '.site-link { display:inline-block; margin-top:7px; font-family:"Manrope",Arial,sans-serif; font-size:9px; letter-spacing:0.12em; color:#b8895a; text-decoration:none; font-weight:500; border-bottom:1px solid #d4b88f; padding-bottom:1px; }'
 
-    + '.save-bar { position:fixed; bottom:0; left:0; right:0; text-align:center; padding:14px; background:rgba(58,53,48,0.95); z-index:10; }'
+    + '.save-bar { text-align:center; padding:16px; background:#3a3530; }'
     + '.save-btn { font-family:"Manrope",Arial,sans-serif; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; padding:10px 32px; background:#b8895a; color:#fff; border:none; cursor:pointer; }'
     + '.save-btn:hover { background:#a07848; }'
 
