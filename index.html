@@ -1392,14 +1392,9 @@ async function downloadConfirmation() {
     if (btn) { btn.textContent = 'Generating image…'; }
 
     var container = document.createElement('div');
-    container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;width:390px;';
-    container.innerHTML = '<div class="conf-card" style="width:390px;"><style>' + cardStyles
-      + '.hero-img { aspect-ratio:auto !important; max-height:360px; width:100%; object-fit:cover; object-position:center 20%; }'
-      + '.h-names { font-size:30px !important; } .h-names .amp { font-size:24px !important; }'
-      + '.h-tagline { font-size:12px !important; } .h-sub { font-size:8px !important; }'
-      + '.hero-content { bottom:14px !important; padding:0 18px !important; }'
-      + '.guest-name { font-size:17px !important; } .dietary { font-size:11px !important; }'
-      + '.event-datetime { font-size:20px !important; }'
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;';
+    container.innerHTML = '<div class="conf-card" style="width:520px;"><style>' + cardStyles
+      + '.hero-img { aspect-ratio:auto !important; height:auto !important; max-height:none !important; }'
       + '</style>' + heroHtml + bodyHtml + '</div>';
     document.body.appendChild(container);
 
@@ -1437,13 +1432,19 @@ async function downloadConfirmation() {
       var card = container.querySelector('.conf-card');
       var canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fffdf9', logging: false });
 
-      // Download as PNG
-      var link = document.createElement('a');
-      link.download = 'rsvp-confirmation.png';
-      link.href = canvas.toDataURL('image/png');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Open image in new tab — user can long-press to save to photos
+      var imgDataUrl = canvas.toDataURL('image/png');
+      var w = window.open('', '_blank');
+      if (w) {
+        w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RSVP Confirmation</title>'
+          + '<style>body{margin:0;background:#e8e3db;display:flex;flex-direction:column;align-items:center;padding:12px;font-family:Arial,sans-serif;}'
+          + 'img{width:100%;max-width:520px;display:block;border-radius:2px;}'
+          + '.hint{margin-top:14px;font-size:13px;color:#7a7268;text-align:center;line-height:1.5;}</style></head><body>'
+          + '<img src="' + imgDataUrl + '" alt="RSVP Confirmation">'
+          + '<p class="hint">Press and hold the image to save to your photos.</p>'
+          + '</body></html>');
+        w.document.close();
+      }
     } catch(err) {
       console.error('Image generation failed:', err);
       alert('Could not generate image. Please take a screenshot instead.');
