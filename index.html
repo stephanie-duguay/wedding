@@ -1391,7 +1391,7 @@ async function downloadConfirmation() {
     + '</div>';
 
   // ═══════════════════════════════════════
-  // MOBILE: render image, navigate to it
+  // MOBILE: render image, share or display inline
   // ═══════════════════════════════════════
   if (isMobile) {
     if (btn) { btn.textContent = 'Generating image…'; }
@@ -1433,25 +1433,46 @@ async function downloadConfirmation() {
 
       var card = container.querySelector('.conf-card');
       var canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fffdf9', logging: false });
-      var imgDataUrl = canvas.toDataURL('image/png');
 
-      // Navigate current page to the image with save instructions and website link
+      // Convert to Blob (avoids huge data-URI string that crashes older devices)
+      var imgBlob = await new Promise(function(resolve) {
+        canvas.toBlob(function(blob) { resolve(blob); }, 'image/png');
+      });
+
       document.body.removeChild(container);
-      document.open();
-      document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>steph&jeff wedding_rsvp confirmation</title>'
-        + '<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500&display=swap" rel="stylesheet">'
-        + '<style>*{box-sizing:border-box;margin:0;padding:0;}body{background:#f7f4ef;font-family:"Manrope",Arial,sans-serif;padding:16px 16px 32px;}'
-        + 'img{width:100%;max-width:520px;display:block;margin:0 auto;border:1px solid #ebe4d4;}'
-        + '.hint{margin-top:16px;font-size:14px;color:#7a7268;text-align:center;line-height:1.6;font-weight:300;}'
-        + '.back-link{display:block;margin-top:16px;text-align:center;font-size:13px;color:#b8895a;text-decoration:none;font-weight:500;letter-spacing:0.05em;}'
-        + '</style></head><body>'
-        + '<img src="' + imgDataUrl + '" alt="RSVP Confirmation">'
-        + '<p class="hint">Press and hold the image to save to your photos.</p>'
-        + '<a class="back-link" href="' + d.websiteUrl + '">Return to Wedding Website</a>'
-        + '</body></html>');
-      document.close();
-      document.title = 'steph&jeff wedding_rsvp confirmation';
-      return;
+
+      if (!imgBlob) { throw new Error('toBlob returned null'); }
+
+      var fileName = 'rsvp-confirmation.png';
+      var imgFile = new File([imgBlob], fileName, { type: 'image/png' });
+
+      // Try Web Share API first (works on all iPhones iOS 15+, most Android browsers)
+      var shared = false;
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [imgFile] })) {
+        try {
+          await navigator.share({ files: [imgFile], title: 'RSVP Confirmation' });
+          shared = true;
+        } catch (shareErr) {
+          // User cancelled or share failed — fall through to inline display
+          if (shareErr.name !== 'AbortError') { console.warn('Share failed:', shareErr); }
+        }
+      }
+
+      if (!shared) {
+        // Fallback: show image inline in an overlay the user can long-press to save
+        var blobUrl = URL.createObjectURL(imgBlob);
+        var overlay = document.createElement('div');
+        overlay.id = 'conf-img-overlay';
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(247,244,239,0.97);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 32px;text-align:center;';
+        overlay.innerHTML = '<img src="' + blobUrl + '" alt="RSVP Confirmation" style="width:100%;max-width:520px;display:block;margin:0 auto;border:1px solid #ebe4d4;">'
+          + '<p style="margin-top:16px;font-size:14px;color:#7a7268;text-align:center;line-height:1.6;font-weight:300;font-family:Manrope,Arial,sans-serif;">Press and hold the image to save to your photos.</p>'
+          + '<button id="conf-img-close" style="display:block;margin:16px auto 0;font-family:Manrope,Arial,sans-serif;font-size:13px;color:#b8895a;background:none;border:1px solid #d4b88f;padding:10px 28px;cursor:pointer;letter-spacing:0.05em;font-weight:500;">Close</button>';
+        document.body.appendChild(overlay);
+        document.getElementById('conf-img-close').addEventListener('click', function() {
+          overlay.remove();
+          URL.revokeObjectURL(blobUrl);
+        });
+      }
 
     } catch(err) {
       console.error('Image generation failed:', err);
