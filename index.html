@@ -752,7 +752,7 @@ const CONFIG = {
     { q: "What is the dress code?", a: "Semi-Formal. For women, think cocktail or midi dresses; for men, dress slacks with a blazer or a suit." },
     { q: "What should I wear on my feet?", a: "The ceremony and parts of the reception are on grass and gravel, so stilettos are not your friend here! We recommend wedges, flats, block heels, or dressy sandals. Comfort is key — there will be dancing!" },
     { q: "What time should I arrive?", a: "Please arrive by 4:00 PM so you have time to find a seat and settle in. The ceremony begins at 4:30 PM sharp." },
-    { q: "How do I get to the venue?", a: "There's no shuttle, so please plan to carpool or arrange a rideshare. Heads up: <strong>construction heading west can seriously back up traffic</strong>, even in the afternoon on a long weekend your drive could easily <strong>double</strong>, so leave plenty of extra time. If you're taking a taxi or Uber, <strong>reserve ahead of time</strong> and let your driver know to <strong>drive up the road to the venue entrance</strong> rather than dropping you at the bottom of the hill." },
+    { q: "How do I get to the venue?", a: "There's no shuttle, so please plan to carpool or arrange a rideshare. Heads up: <strong>construction heading west can seriously back up traffic</strong>, even in the afternoon on a long weekend your drive could easily <strong>double</strong>, so leave plenty of extra time. If you're taking a taxi or Uber, <strong>reserve ahead of time</strong> and let your driver know to <strong>drive up the road to the venue entrance</strong> rather than dropping / picking you up at the bottom of the hill." },
     { q: "Will there be parking at the venue?", a: "Yes! Free parking is available right on the farm property. The lot is on grass and gravel — see the footwear question above for more on what to wear." },
     { q: "Is the wedding indoors or outdoors?", a: "Both! The ceremony will be outdoors on the grounds of Lavender Ridge Farm. The reception takes place in and around the timber-frame barn with a string-lit patio. We'll have covered areas in case of rain, but fingers crossed for beautiful weather!" },
     { q: "Can I use my phone during the ceremony?", a: "We're having an <strong>unplugged ceremony</strong> — we kindly ask that all phones and cameras be put away during the ceremony so everyone can be fully present. Our photographer will capture every moment, and we'll share the photos with you afterward!" },
@@ -1329,15 +1329,15 @@ async function downloadConfirmation() {
     + '@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@300;400;500;600&display=swap");'
     + '.conf-card * { box-sizing:border-box; margin:0; padding:0; }'
     + '.conf-card { width:520px; font-family:"Manrope",Arial,sans-serif; background:#fffdf9; }'
-    + '.hero { width:100%; overflow:hidden; }'
-    + '.hero-img { display:block; width:100%; aspect-ratio:4/3; object-fit:cover; object-position:center 20%; }'
-    + '.hero-gradient { display:none; }'
-    + '.hero-content { text-align:center; padding:20px 28px 16px; background:#fffdf9; }'
-    + '.h-sub { font-family:"Manrope",Arial,sans-serif; font-size:10px; letter-spacing:0.35em; text-transform:uppercase; margin-bottom:6px; color:#8c857c; }'
-    + '.h-names { font-family:"Cormorant Garamond","Georgia",serif; font-size:42px; font-weight:300; line-height:1.15; color:#3a3530; }'
-    + '.h-names .amp { font-style:italic; color:#b8895a; font-size:35px; margin:0 3px; }'
-    + '.h-line { width:30px; height:1px; background:#d4b88f; margin:12px auto; }'
-    + '.h-tagline { font-family:"Cormorant Garamond","Georgia",serif; font-style:italic; font-size:15px; font-weight:300; color:#8c857c; line-height:1.5; }'
+    + '.hero { position:relative; width:100%; overflow:hidden; }'
+    + '.hero-img { display:block; width:100%; aspect-ratio:3/4; object-fit:cover; object-position:center 20%; }'
+    + '.hero-gradient { position:absolute; inset:0; background:linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%); }'
+    + '.hero-content { position:absolute; bottom:20px; left:0; right:0; text-align:center; color:#fff; z-index:2; padding:0 28px; }'
+    + '.h-sub { font-family:"Manrope",Arial,sans-serif; font-size:10px; letter-spacing:0.35em; text-transform:uppercase; margin-bottom:6px; opacity:0.9; }'
+    + '.h-names { font-family:"Cormorant Garamond","Georgia",serif; font-size:42px; font-weight:300; line-height:1.15; }'
+    + '.h-names .amp { font-style:italic; color:#d4b88f; font-size:35px; margin:0 3px; }'
+    + '.h-line { width:30px; height:1px; background:rgba(255,255,255,0.5); margin:12px auto; }'
+    + '.h-tagline { font-family:"Cormorant Garamond","Georgia",serif; font-style:italic; font-size:15px; font-weight:300; opacity:0.92; line-height:1.5; }'
     + '.header-plain { text-align:center; padding:32px 28px 20px; }'
     + '.header-plain .h-sub { color:#8c857c; }'
     + '.header-plain .h-names { color:#3a3530; }'
