@@ -748,14 +748,15 @@ const CONFIG = {
   // ─── FAQs ────────────────────────────────────────────────────────────────────
   faqs: [
     { q: "When should I RSVP by?", a: "Please RSVP by <strong>June 14, 2026</strong> so we can finalize our headcount with the caterers and venue. The RSVP form on this website will close after that date, so please don't leave it to the last minute!" },
-    { q: "What is the dress code?", a: "Semi-Formal. For women, think cocktail or midi dresses; for men, dress slacks with a blazer or a suit." },
-    { q: "Is the wedding indoors or outdoors?", a: "Both! The ceremony will be outdoors on the grounds of Lavender Ridge Farm. The reception takes place in and around the timber-frame barn with a string-lit patio. We'll have covered areas in case of rain, but fingers crossed for beautiful weather!" },
-    { q: "What time should I arrive?", a: "Please arrive by 4:00 PM so you have time to find a seat and settle in. The ceremony begins at 4:30 PM sharp." },
-    { q: "What kind of food will be served?", a: "We're serving a delicious BBQ-style dinner with plenty of options. If you have dietary restrictions or allergies, please note them in your RSVP and we'll make sure you're taken care of." },
     { q: "Can I bring a plus one?", a: "Due to venue capacity, we can only accommodate guests who are named on the invitation. If you've been given a plus one, their name will appear in your party's RSVP." },
-    { q: "Will there be parking at the venue?", a: "Yes! Free parking is available right on the farm property. The lot is on grass and gravel — see the footwear question below for more on what to wear." },
-    { q: "How do I get to the venue?", a: "We are not providing a shuttle service, so please plan your transportation accordingly. We recommend carpooling with friends or family, or arranging a rideshare if you'd prefer not to drive. The Brookstreet Hotel (where our room block is) is about 20 minutes from the venue." },
+    { q: "What is the dress code?", a: "Semi-Formal. For women, think cocktail or midi dresses; for men, dress slacks with a blazer or a suit." },
     { q: "What should I wear on my feet?", a: "The ceremony and parts of the reception are on grass and gravel, so stilettos are not your friend here! We recommend wedges, flats, block heels, or dressy sandals. Comfort is key — there will be dancing!" },
+    { q: "What time should I arrive?", a: "Please arrive by 4:00 PM so you have time to find a seat and settle in. The ceremony begins at 4:30 PM sharp." },
+    { q: "How do I get to the venue?", a: "We are not providing a shuttle service, so please plan your transportation accordingly. We recommend carpooling with friends or family, or arranging a rideshare if you'd prefer not to drive. The Brookstreet Hotel (where our room block is) is about 20 minutes from the venue under normal conditions — but be aware that <strong>construction on the roads heading west can seriously back up traffic</strong>, even in the afternoon. On a long weekend, your drive time could easily <strong>double</strong>, so please give yourself plenty of extra time. If you're taking a taxi or Uber, we'd recommend <strong>reserving your ride ahead of time</strong> rather than trying to hail one on the spot — availability can be limited out here. Also, let your driver know to <strong>drive up the road to the venue entrance</strong> rather than dropping you off at the bottom of the hill." },
+    { q: "Will there be parking at the venue?", a: "Yes! Free parking is available right on the farm property. The lot is on grass and gravel — see the footwear question above for more on what to wear." },
+    { q: "Is the wedding indoors or outdoors?", a: "Both! The ceremony will be outdoors on the grounds of Lavender Ridge Farm. The reception takes place in and around the timber-frame barn with a string-lit patio. We'll have covered areas in case of rain, but fingers crossed for beautiful weather!" },
+    { q: "Can I use my phone during the ceremony?", a: "We're having an <strong>unplugged ceremony</strong> — we kindly ask that all phones and cameras be put away during the ceremony so everyone can be fully present. Our photographer will capture every moment, and we'll share the photos with you afterward!" },
+    { q: "What kind of food will be served?", a: "We're serving a delicious BBQ-style dinner with plenty of options. If you have dietary restrictions or allergies, please note them in your RSVP and we'll make sure you're taken care of." },
     { q: "Do you have a registry?", a: "No registry! Your presence at our wedding is the greatest gift. We kindly ask for no boxed gifts, a card table will be set up at the reception for any monetary gifts, which will go toward our honeymoon and starting our life together." },
     { q: "Who should I contact before the wedding?", a: "For any questions in the lead-up to the big day (RSVPs, travel, accommodations, or anything else) please reach out to Claudia Duguay on her cell <a href='tel:6133623909' style='color:#b8895a'>613-362-3909</a>." },
     { q: "Who should I contact the day of the wedding?", a: "If you need anything on the wedding day, please reach out to our day-of coordinator, Shannon Hodgins, on her cell: <a href='tel:6138826563' style='color:#b8895a'>613-882-6563</a>. Please avoid calling us directly — we'll be a little busy! 😊" },
@@ -1391,96 +1392,31 @@ async function downloadConfirmation() {
     + '</div>';
 
   // ═══════════════════════════════════════
-  // MOBILE: render image, share or display inline
+  // MOBILE: pure-HTML confirmation overlay
+  // No html2canvas, no CDN, no canvas — just styled HTML the user can screenshot.
   // ═══════════════════════════════════════
   if (isMobile) {
-    if (btn) { btn.textContent = 'Generating image…'; }
+    var overlay = document.createElement('div');
+    overlay.id = 'conf-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#f7f4ef;overflow-y:auto;-webkit-overflow-scrolling:touch;';
 
-    var container = document.createElement('div');
-    container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;';
-    container.innerHTML = '<div class="conf-card" style="width:520px;"><style>' + cardStyles
-      + '.hero-img { aspect-ratio:auto !important; height:auto !important; max-height:none !important; }'
-      + '</style>' + heroHtml + bodyHtml + '</div>';
-    document.body.appendChild(container);
+    var overlayHtml = '<div style="max-width:520px;margin:0 auto;padding:0 0 32px;">'
+      + '<style>' + cardStyles + '.conf-card{width:100%;max-width:520px;margin:0 auto;}</style>'
+      + '<div class="conf-card">' + heroHtml + bodyHtml + '</div>'
+      + '<p style="margin:20px 16px 0;font-size:14px;color:#7a7268;text-align:center;line-height:1.6;font-weight:300;font-family:Manrope,Arial,sans-serif;">Take a screenshot to save your confirmation.</p>'
+      + '<button id="conf-overlay-close" style="display:block;margin:14px auto 0;font-family:Manrope,Arial,sans-serif;font-size:13px;color:#b8895a;background:#fff;border:1px solid #d4b88f;padding:12px 32px;cursor:pointer;letter-spacing:0.05em;font-weight:500;">Return to Website</button>'
+      + '</div>';
 
-    try {
-      var heroImg = container.querySelector('.hero-img');
-      if (heroImg && !heroImg.complete) {
-        await new Promise(function(resolve) {
-          heroImg.onload = resolve;
-          heroImg.onerror = resolve;
-          setTimeout(resolve, 4000);
-        });
-      }
-      if (document.fonts && document.fonts.ready) await document.fonts.ready;
-      await new Promise(function(r) { setTimeout(r, 600); });
+    overlay.innerHTML = overlayHtml;
+    document.body.appendChild(overlay);
+    document.body.style.overflow = 'hidden';
 
-      if (!window.html2canvas) {
-        await new Promise(function(resolve, reject) {
-          var s = document.createElement('script');
-          s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-          s.onload = resolve;
-          s.onerror = function() {
-            var s2 = document.createElement('script');
-            s2.src = 'https://unpkg.com/html2canvas@1.4.1/dist/html2canvas.min.js';
-            s2.onload = resolve;
-            s2.onerror = reject;
-            document.head.appendChild(s2);
-          };
-          document.head.appendChild(s);
-        });
-      }
+    document.getElementById('conf-overlay-close').addEventListener('click', function() {
+      overlay.remove();
+      document.body.style.overflow = '';
+    });
 
-      var card = container.querySelector('.conf-card');
-      var canvas = await html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#fffdf9', logging: false });
-
-      // Convert to Blob (avoids huge data-URI string that crashes older devices)
-      var imgBlob = await new Promise(function(resolve) {
-        canvas.toBlob(function(blob) { resolve(blob); }, 'image/png');
-      });
-
-      document.body.removeChild(container);
-
-      if (!imgBlob) { throw new Error('toBlob returned null'); }
-
-      var fileName = 'rsvp-confirmation.png';
-      var imgFile = new File([imgBlob], fileName, { type: 'image/png' });
-
-      // Try Web Share API first (works on all iPhones iOS 15+, most Android browsers)
-      var shared = false;
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [imgFile] })) {
-        try {
-          await navigator.share({ files: [imgFile], title: 'RSVP Confirmation' });
-          shared = true;
-        } catch (shareErr) {
-          // User cancelled or share failed — fall through to inline display
-          if (shareErr.name !== 'AbortError') { console.warn('Share failed:', shareErr); }
-        }
-      }
-
-      if (!shared) {
-        // Fallback: show image inline in an overlay the user can long-press to save
-        var blobUrl = URL.createObjectURL(imgBlob);
-        var overlay = document.createElement('div');
-        overlay.id = 'conf-img-overlay';
-        overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(247,244,239,0.97);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 32px;text-align:center;';
-        overlay.innerHTML = '<img src="' + blobUrl + '" alt="RSVP Confirmation" style="width:100%;max-width:520px;display:block;margin:0 auto;border:1px solid #ebe4d4;">'
-          + '<p style="margin-top:16px;font-size:14px;color:#7a7268;text-align:center;line-height:1.6;font-weight:300;font-family:Manrope,Arial,sans-serif;">Press and hold the image to save to your photos.</p>'
-          + '<button id="conf-img-close" style="display:block;margin:16px auto 0;font-family:Manrope,Arial,sans-serif;font-size:13px;color:#b8895a;background:none;border:1px solid #d4b88f;padding:10px 28px;cursor:pointer;letter-spacing:0.05em;font-weight:500;">Close</button>';
-        document.body.appendChild(overlay);
-        document.getElementById('conf-img-close').addEventListener('click', function() {
-          overlay.remove();
-          URL.revokeObjectURL(blobUrl);
-        });
-      }
-
-    } catch(err) {
-      console.error('Image generation failed:', err);
-      if (container.parentNode) document.body.removeChild(container);
-      alert('Could not generate image. Please take a screenshot instead.');
-    } finally {
-      if (btn) { btn.disabled = false; btn.textContent = 'Save Confirmation'; }
-    }
+    if (btn) { btn.disabled = false; btn.textContent = 'Save Confirmation'; }
     return;
   }
 
